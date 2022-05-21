@@ -1,31 +1,38 @@
-import { Mask } from './setupWorker/glossary'
-import { DefaultRequestBody, ResponseResolver } from './handlers/RequestHandler'
+import { DefaultBodyType, ResponseResolver } from './handlers/RequestHandler'
 import {
   RESTMethods,
   RestContext,
   RestHandler,
   RestRequest,
-  RequestParams,
 } from './handlers/RestHandler'
+import { Path, PathParams } from './utils/matching/matchRequestUrl'
 
-function createRestHandler(method: RESTMethods) {
+function createRestHandler<Method extends RESTMethods | RegExp>(
+  method: Method,
+) {
   return <
-    RequestBodyType extends DefaultRequestBody = DefaultRequestBody,
-    ResponseBody extends DefaultRequestBody = any,
-    Params extends RequestParams = RequestParams
+    RequestBodyType extends DefaultBodyType = DefaultBodyType,
+    Params extends PathParams<keyof Params> = PathParams,
+    ResponseBody extends DefaultBodyType = DefaultBodyType,
   >(
-    mask: Mask,
+    path: Path,
     resolver: ResponseResolver<
-      RestRequest<RequestBodyType, Params>,
+      RestRequest<
+        Method extends RESTMethods.HEAD | RESTMethods.GET
+          ? never
+          : RequestBodyType,
+        Params
+      >,
       RestContext,
       ResponseBody
     >,
   ) => {
-    return new RestHandler(method, mask, resolver)
+    return new RestHandler(method, path, resolver)
   }
 }
 
 export const rest = {
+  all: createRestHandler(/.+/),
   head: createRestHandler(RESTMethods.HEAD),
   get: createRestHandler(RESTMethods.GET),
   post: createRestHandler(RESTMethods.POST),

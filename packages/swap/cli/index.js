@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const yargs = require('yargs');
+const yargs = require('yargs')
 
 yargs
   .usage('$0 <cmd> [args]')
@@ -14,9 +14,13 @@ yargs
           required: true,
           normalize: true,
         })
-        .example('init', 'swap init public');
+        .example('init', 'swap init public')
+        .option('save', {
+          type: 'boolean',
+          description: 'Save the worker directory in your package.json',
+        })
     },
     require('./init'),
   )
   .demandCommand()
-  .help().argv;
+  .help().argv

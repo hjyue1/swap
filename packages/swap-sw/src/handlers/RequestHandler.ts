@@ -1,12 +1,27 @@
-import { Headers } from 'headers-utils'
-import { MockedResponse, response, ResponseComposition } from '../response'
+import { Headers } from 'headers-polyfill'
+import {
+  MaybePromise,
+  MockedResponse,
+  response,
+  ResponseComposition,
+} from '../response'
 import { getCallFrame } from '../utils/internal/getCallFrame'
+import { isIterable } from '../utils/internal/isIterable'
 import { status } from '../context/status'
 import { set } from '../context/set'
 import { delay } from '../context/delay'
 import { fetch } from '../context/fetch'
+import { ResponseResolutionContext } from '../utils/getResponse'
+import { SerializedResponse } from '../setupWorker/glossary'
 
-export const defaultContext = {
+export type DefaultContext = {
+  status: typeof status
+  set: typeof set
+  delay: typeof delay
+  fetch: typeof fetch
+}
+
+export const defaultContext: DefaultContext = {
   status,
   set,
   delay,
@@ -18,13 +33,16 @@ export type DefaultRequestMultipartBody = Record<
   string | File | (string | File)[]
 >
 
-export type DefaultRequestBody =
+export type DefaultBodyType =
   | Record<string, any>
   | DefaultRequestMultipartBody
   | string
+  | number
+  | boolean
+  | null
   | undefined
 
-export interface MockedRequest<Body = DefaultRequestBody> {
+export interface MockedRequest<Body = DefaultBodyType> {
   id: string
   url: URL
   method: Request['method']
@@ -41,27 +59,40 @@ export interface MockedRequest<Body = DefaultRequestBody> {
   referrerPolicy: Request['referrerPolicy']
   body: Body
   bodyUsed: Request['bodyUsed']
+  passthrough: typeof passthrough
 }
 
-interface RequestHandlerDefaultInfo {
+export interface RequestHandlerDefaultInfo {
+  header: string
+}
+
+export interface RequestHandlerInternalInfo {
   callFrame?: string
 }
 
-type RequestHandlerInfo<ExtraInfo extends Record<string, any>> = {
-  header: string
-} & ExtraInfo
-
 type ContextMap = Record<string, (...args: any[]) => any>
 
-export type ResponseResolverReturnType<R> = R | undefined | void
-export type AsyncResponseResolverReturnType<R> =
-  | Promise<ResponseResolverReturnType<R>>
-  | ResponseResolverReturnType<R>
+export type ResponseResolverReturnType<ReturnType> =
+  | ReturnType
+  | undefined
+  | void
+
+export type MaybeAsyncResponseResolverReturnType<ReturnType> = MaybePromise<
+  ResponseResolverReturnType<ReturnType>
+>
+
+export type AsyncResponseResolverReturnType<ReturnType> =
+  | MaybeAsyncResponseResolverReturnType<ReturnType>
+  | Generator<
+      MaybeAsyncResponseResolverReturnType<ReturnType>,
+      MaybeAsyncResponseResolverReturnType<ReturnType>,
+      MaybeAsyncResponseResolverReturnType<ReturnType>
+    >
 
 export type ResponseResolver<
   RequestType = MockedRequest,
   ContextType = typeof defaultContext,
-  BodyType = any
+  BodyType = any,
 > = (
   req: RequestType,
   res: ResponseComposition<BodyType>,
@@ -69,7 +100,7 @@ export type ResponseResolver<
 ) => AsyncResponseResolverReturnType<MockedResponse<BodyType>>
 
 export interface RequestHandlerOptions<HandlerInfo> {
-  info: RequestHandlerInfo<HandlerInfo>
+  info: HandlerInfo
   resolver: ResponseResolver<any, any>
   ctx?: ContextMap
 }
@@ -82,14 +113,22 @@ export interface RequestHandlerExecutionResult<PublicRequestType> {
 }
 
 export abstract class RequestHandler<
-  HandlerInfo extends Record<string, any> = Record<string, any>,
+  HandlerInfo extends RequestHandlerDefaultInfo = RequestHandlerDefaultInfo,
   Request extends MockedRequest = MockedRequest,
   ParsedResult = any,
-  PublicRequest extends MockedRequest = Request
+  PublicRequest extends MockedRequest = Request,
 > {
-  public info: RequestHandlerDefaultInfo & RequestHandlerInfo<HandlerInfo>
-  private ctx: ContextMap
+  public info: HandlerInfo & RequestHandlerInternalInfo
   public shouldSkip: boolean
+
+  private ctx: ContextMap
+  private resolverGenerator?: Generator<
+    MaybeAsyncResponseResolverReturnType<any>,
+    MaybeAsyncResponseResolverReturnType<any>,
+    MaybeAsyncResponseResolverReturnType<any>
+  >
+  private resolverGeneratorResult?: MaybeAsyncResponseResolverReturnType<any>
+
   protected resolver: ResponseResolver<any, any>
 
   constructor(options: RequestHandlerOptions<HandlerInfo>) {
@@ -97,7 +136,7 @@ export abstract class RequestHandler<
     this.ctx = options.ctx || defaultContext
     this.resolver = options.resolver
 
-    const callFrame = getCallFrame()
+    const callFrame = getCallFrame(new Error())
 
     this.info = {
       ...options.info,
@@ -111,6 +150,7 @@ export abstract class RequestHandler<
   abstract predicate(
     request: MockedRequest,
     parsedResult: ParsedResult,
+    resolutionContext?: ResponseResolutionContext,
   ): boolean
 
   /**
@@ -118,7 +158,7 @@ export abstract class RequestHandler<
    */
   abstract log(
     request: Request,
-    res: any,
+    response: SerializedResponse<any>,
     handler: this,
     parsedResult: ParsedResult,
   ): void
@@ -127,15 +167,25 @@ export abstract class RequestHandler<
    * Parse the captured request to extract additional information from it.
    * Parsed result is then exposed to other methods of this request handler.
    */
-  parse(request: MockedRequest): ParsedResult {
+  parse(
+    _request: MockedRequest,
+    _resolutionContext?: ResponseResolutionContext,
+  ): ParsedResult {
     return null as any
   }
 
   /**
    * Test if this handler matches the given request.
    */
-  public test(request: MockedRequest): boolean {
-    return this.predicate(request, this.parse(request))
+  public test(
+    request: MockedRequest,
+    resolutionContext?: ResponseResolutionContext,
+  ): boolean {
+    return this.predicate(
+      request,
+      this.parse(request, resolutionContext),
+      resolutionContext,
+    )
   }
 
   /**
@@ -144,7 +194,7 @@ export abstract class RequestHandler<
    */
   protected getPublicRequest(
     request: MockedRequest,
-    parsedResult: ParsedResult,
+    _parsedResult: ParsedResult,
   ) {
     return request as PublicRequest
   }
@@ -159,20 +209,29 @@ export abstract class RequestHandler<
    */
   public async run(
     request: MockedRequest,
+    resolutionContext?: ResponseResolutionContext,
   ): Promise<RequestHandlerExecutionResult<PublicRequest> | null> {
     if (this.shouldSkip) {
       return null
     }
 
-    const parsedResult = this.parse(request)
-    const shouldIntercept = this.predicate(request, parsedResult)
+    const parsedResult = this.parse(request, resolutionContext)
+    const shouldIntercept = this.predicate(
+      request,
+      parsedResult,
+      resolutionContext,
+    )
 
     if (!shouldIntercept) {
       return null
     }
 
     const publicRequest = this.getPublicRequest(request, parsedResult)
-    const mockedResponse = await this.resolver(
+
+    // Create a response extraction wrapper around the resolver
+    // since it can be both an async function and a generator.
+    const executeResolver = this.wrapResolver(this.resolver)
+    const mockedResponse = await executeResolver(
       publicRequest,
       response,
       this.ctx,
@@ -183,6 +242,34 @@ export abstract class RequestHandler<
       publicRequest,
       mockedResponse,
     )
+  }
+
+  private wrapResolver(
+    resolver: ResponseResolver<any, any>,
+  ): ResponseResolver<AsyncResponseResolverReturnType<any>, any> {
+    return async (req, res, ctx) => {
+      const result = this.resolverGenerator || (await resolver(req, res, ctx))
+
+      if (isIterable<AsyncResponseResolverReturnType<any>>(result)) {
+        const { value, done } = result[Symbol.iterator]().next()
+        const nextResponse = await value
+
+        // If the generator is done and there is no next value,
+        // return the previous generator's value.
+        if (!nextResponse && done) {
+          return this.resolverGeneratorResult
+        }
+
+        if (!this.resolverGenerator) {
+          this.resolverGenerator = result
+        }
+
+        this.resolverGeneratorResult = nextResponse
+        return nextResponse
+      }
+
+      return result
+    }
   }
 
   private createExecutionResult(
@@ -196,5 +283,24 @@ export abstract class RequestHandler<
       request,
       response: response || null,
     }
+  }
+}
+
+/**
+ * Bypass this intercepted request.
+ * This will make a call to the actual endpoint requested.
+ */
+export function passthrough(): MockedResponse<null> {
+  // Constructing a dummy "101 Continue" mocked response
+  // to keep the return type of the resolver consistent.
+  return {
+    status: 101,
+    statusText: 'Continue',
+    headers: new Headers(),
+    body: null,
+    // Setting "passthrough" to true will signal the response pipeline
+    // to perform this intercepted request as-is.
+    passthrough: true,
+    once: false,
   }
 }

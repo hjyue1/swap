@@ -1,17 +1,23 @@
+import { isNodeProcess } from 'is-node-process'
 import { StrictEventEmitter } from 'strict-event-emitter'
 import {
   SetupWorkerInternalContext,
   SetupWorkerApi,
   ServiceWorkerIncomingEventsMap,
+  WorkerLifecycleEventsMap,
 } from './glossary'
-import { createStart } from './start/createStart'
+import { createStartHandler } from './start/createStartHandler'
 import { createStop } from './stop/createStop'
 import * as requestHandlerUtils from '../utils/internal/requestHandlerUtils'
-import { isNodeProcess } from '../utils/internal/isNodeProcess'
 import { ServiceWorkerMessage } from '../utils/createBroadcastChannel'
 import { jsonParse } from '../utils/internal/jsonParse'
 import { RequestHandler } from '../handlers/RequestHandler'
 import { RestHandler } from '../handlers/RestHandler'
+import { prepareStartHandler } from './start/utils/prepareStartHandler'
+import { createFallbackStart } from './start/createFallbackStart'
+import { createFallbackStop } from './stop/createFallbackStop'
+import { devUtils } from '../utils/internal/devUtils'
+import { pipeEvents } from '../utils/internal/pipeEvents'
 
 interface Listener {
   target: EventTarget
@@ -23,21 +29,45 @@ interface Listener {
 // so it persists between Fash refreshes of the application's code.
 let listeners: Listener[] = []
 
+/**
+ * Creates a new mock Service Worker registration
+ * with the given request handlers.
+ * @param {RequestHandler[]} requestHandlers List of request handlers
+ */
 export function setupWorker(
   ...requestHandlers: RequestHandler[]
 ): SetupWorkerApi {
   requestHandlers.forEach((handler) => {
     if (Array.isArray(handler))
       throw new Error(
-        `[SWAP] Failed to call "setupWorker" given an Array of request handlers (setupWorker([a, b])), expected to receive each handler individually: setupWorker(a, b).`,
+        devUtils.formatMessage(
+          'Failed to call "setupWorker" given an Array of request handlers (setupWorker([a, b])), expected to receive each handler individually: setupWorker(a, b).',
+        ),
       )
   })
+
+  // Error when attempting to run this function in a Node.js environment.
+  if (isNodeProcess()) {
+    throw new Error(
+      devUtils.formatMessage(
+        'Failed to execute `setupWorker` in a non-browser environment. Consider using `setupServer` for Node.js environment instead.',
+      ),
+    )
+  }
+
+  const emitter = new StrictEventEmitter<WorkerLifecycleEventsMap>()
+  const publicEmitter = new StrictEventEmitter<WorkerLifecycleEventsMap>()
+  pipeEvents(emitter, publicEmitter)
+
   const context: SetupWorkerInternalContext = {
+    // Mocking is not considered enabled until the worker
+    // signals back the successful activation event.
+    isMockingEnabled: false,
     startOptions: undefined,
     worker: null,
     registration: null,
     requestHandlers: [...requestHandlers],
-    emitter: new StrictEventEmitter(),
+    emitter,
     workerChannel: {
       on(eventType, callback) {
         context.events.addListener(
@@ -124,21 +154,27 @@ export function setupWorker(
         })
       },
     },
+    useFallbackMode:
+      !('serviceWorker' in navigator) || location.protocol === 'file:',
   }
 
-  // Error when attempting to run this function in a Node.js environment.
-  if (isNodeProcess()) {
-    throw new Error(
-      '[SWAP] Failed to execute `setupWorker` in a non-browser environment. Consider using `setupServer` for Node.js environment instead.',
-    )
-  }
+  const startHandler = context.useFallbackMode
+    ? createFallbackStart(context)
+    : createStartHandler(context)
+  const stopHandler = context.useFallbackMode
+    ? createFallbackStop(context)
+    : createStop(context)
 
   return {
-    start: createStart(context),
-    stop: createStop(context),
+    start: prepareStartHandler(startHandler, context),
+    stop() {
+      context.events.removeAllListeners()
+      context.emitter.removeAllListeners()
+      publicEmitter.removeAllListeners()
+      stopHandler()
+    },
 
     use(...handlers) {
-      console.log('adding new handlers', handlers)
       requestHandlerUtils.use(context.requestHandlers, ...handlers)
     },
 
@@ -168,16 +204,20 @@ export function setupWorker(
 
         console.log('Handler:', handler)
 
-        if (handler instanceof RestHandler) {
-          console.log('Match:', `path=${handler.info.mask}`)
-        }
-
         console.groupEnd()
       })
     },
 
-    on(eventType, listener) {
-      context.emitter.addListener(eventType, listener)
+    events: {
+      on(...args) {
+        return publicEmitter.on(...args)
+      },
+      removeListener(...args) {
+        return publicEmitter.removeListener(...args)
+      },
+      removeAllListeners(...args) {
+        return publicEmitter.removeAllListeners(...args)
+      },
     },
   }
 }

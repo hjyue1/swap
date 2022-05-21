@@ -1,4 +1,4 @@
-import { Headers } from 'headers-utils'
+import { Headers } from 'headers-polyfill'
 import { MockedRequest } from '../handlers/RequestHandler'
 import { isNodeProcess } from '../utils/internal/isNodeProcess'
 
@@ -28,8 +28,15 @@ const createFetchRequestParameters = (input: MockedRequest): RequestInit => {
     return requestParameters
   }
 
-  requestParameters.body =
-    typeof body === 'object' ? JSON.stringify(body) : body
+  if (
+    typeof body === 'object' ||
+    typeof body === 'number' ||
+    typeof body === 'boolean'
+  ) {
+    requestParameters.body = JSON.stringify(body)
+  } else {
+    requestParameters.body = body
+  }
 
   return requestParameters
 }

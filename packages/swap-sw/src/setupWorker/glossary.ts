@@ -1,14 +1,17 @@
-import { HeadersList } from 'headers-utils'
+import { FlatHeadersObject } from 'headers-polyfill'
 import { StrictEventEmitter } from 'strict-event-emitter'
-import { MockedResponse } from '../response'
-import { SharedOptions } from '../sharedOptions'
+import {
+  LifeCycleEventEmitter,
+  LifeCycleEventsMap,
+  SharedOptions,
+} from '../sharedOptions'
 import { ServiceWorkerMessage } from '../utils/createBroadcastChannel'
-import { createStart } from './start/createStart'
-import { createStop } from './stop/createStop'
-import { MockedRequest, RequestHandler } from '../handlers/RequestHandler'
+import { RequestHandler } from '../handlers/RequestHandler'
+import { InterceptorApi } from '@mswjs/interceptors'
+import { Path } from '../utils/matching/matchRequestUrl'
+import { RequiredDeep } from '../typeUtils'
 
-export type Mask = RegExp | string
-export type ResolvedMask = Mask | URL
+export type ResolvedPath = Path | URL
 
 type RequestWithoutMethods = Omit<
   Request,
@@ -68,8 +71,6 @@ export type ServiceWorkerOutgoingEventTypes =
   | 'INTEGRITY_CHECK_REQUEST'
   | 'KEEPALIVE_REQUEST'
   | 'CLIENT_CLOSED'
-  | 'ONLINE'
-  | 'OFFLINE'
 
 /**
  * Map of the events that can be sent to the Service Worker
@@ -77,22 +78,15 @@ export type ServiceWorkerOutgoingEventTypes =
  */
 export type ServiceWorkerFetchEventTypes =
   | 'MOCK_SUCCESS'
-  | 'MOCK_BY_PASS'
   | 'MOCK_NOT_FOUND'
   | 'NETWORK_ERROR'
   | 'INTERNAL_ERROR'
 
-export interface WorkerLifecycleEventsMap {
-  'request:start': (request: MockedRequest) => void
-  'request:match': (request: MockedRequest) => void
-  'request:unhandled': (request: MockedRequest) => void
-  'request:end': (request: MockedRequest) => void
-  'response:mocked': (response: Response, requestId: string) => void
-  'response:bypass': (response: Response, requestId: string) => void
-}
+export type WorkerLifecycleEventsMap = LifeCycleEventsMap<Response>
 
 export interface SetupWorkerInternalContext {
-  startOptions: StartOptions | undefined
+  isMockingEnabled: boolean
+  startOptions?: RequiredDeep<StartOptions>
   worker: ServiceWorker | null
   registration: ServiceWorkerRegistration | null
   requestHandlers: RequestHandler[]
@@ -121,10 +115,10 @@ export interface SetupWorkerInternalContext {
      * Adds an event listener on the given target.
      * Returns a clean-up function that removes that listener.
      */
-    addListener<E extends Event>(
+    addListener<EventType extends Event = Event>(
       target: EventTarget,
       eventType: string,
-      listener: (event: E) => void,
+      listener: (event: EventType) => void,
     ): () => void
     /**
      * Removes all currently attached listeners.
@@ -139,6 +133,8 @@ export interface SetupWorkerInternalContext {
       ServiceWorkerMessage<EventType, ServiceWorkerIncomingEventsMap[EventType]>
     >
   }
+  useFallbackMode: boolean
+  fallbackInterceptor?: InterceptorApi
 }
 
 export type ServiceWorkerInstanceTuple = [
@@ -151,11 +147,15 @@ export type FindWorker = (
   mockServiceWorkerUrl: string,
 ) => boolean
 
-export type StartOptions = SharedOptions & {
+export interface StartOptions extends SharedOptions {
   /**
-   * Service Worker instance options.
+   * Service Worker registration options.
    */
   serviceWorker?: {
+    /**
+     * Custom url to the worker script.
+     * @default "./mockServiceWorker.js"
+     */
     url?: string
     options?: RegistrationOptions
   }
@@ -163,12 +163,14 @@ export type StartOptions = SharedOptions & {
   /**
    * Disables the logging of captured requests
    * into browser's console.
+   * @default false
    */
   quiet?: boolean
 
   /**
    * Defers any network requests until the Service Worker
-   * instance is ready. Defaults to `true`.
+   * instance is activated.
+   * @default true
    */
   waitUntilReady?: boolean
 
@@ -177,40 +179,29 @@ export type StartOptions = SharedOptions & {
    * of all registered Service Workers on the page.
    */
   findWorker?: FindWorker
-
-  /**
-   * A custom bypass mode to bypass a request in the list
-   * of all request on the page.
-   */
-  bypassMode?: 'none' | 'api' | 'jsbridge'
-
-  /**
-   * Whether to enable online mock mode
-   */
-  isOnline?: boolean
-
-  /**
-   * The prefix address of the resource
-   */
-  baseURL?: string
 }
 
-export type ResponseWithSerializedHeaders<BodyType = any> = Omit<
-  MockedResponse<BodyType>,
-  'headers'
-> & {
-  headers: HeadersList
+export interface SerializedResponse<BodyType = any> {
+  status: number
+  statusText: string
+  headers: FlatHeadersObject
+  body: BodyType
 }
+
+export type StartReturnType = Promise<ServiceWorkerRegistration | undefined>
+export type StartHandler = (
+  options: RequiredDeep<StartOptions>,
+  initialOptions: StartOptions,
+) => StartReturnType
+export type StopHandler = () => void
 
 export interface SetupWorkerApi {
-  start: ReturnType<typeof createStart>
-  stop: ReturnType<typeof createStop>
+  start: (options?: StartOptions) => StartReturnType
+  stop: StopHandler
   use: (...handlers: RequestHandler[]) => void
   restoreHandlers: () => void
   resetHandlers: (...nextHandlers: RequestHandler[]) => void
   printHandlers: () => void
-  on<EventType extends keyof WorkerLifecycleEventsMap>(
-    eventType: EventType,
-    listener: WorkerLifecycleEventsMap[EventType],
-  ): void
+
+  events: LifeCycleEventEmitter<WorkerLifecycleEventsMap>
 }

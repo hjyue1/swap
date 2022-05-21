@@ -2,6 +2,7 @@ import { until } from '@open-draft/until'
 import { getWorkerByRegistration } from './getWorkerByRegistration'
 import { ServiceWorkerInstanceTuple, FindWorker } from '../../glossary'
 import { getAbsoluteWorkerUrl } from '../../../utils/url/getAbsoluteWorkerUrl'
+import { devUtils } from '../../../utils/internal/devUtils'
 
 /**
  * Returns an active Service Worker instance.
@@ -70,14 +71,20 @@ export const getWorkerInstance = async (
     if (isWorkerMissing) {
       const scopeUrl = new URL(options?.scope || '/', location.href)
 
-      throw new Error(`[SWAP] Failed to register a Service Worker for scope ('${scopeUrl.href}') with script ('${absoluteWorkerUrl}'): Service Worker script does not exist at the given path.
+      throw new Error(
+        devUtils.formatMessage(`\
+Failed to register a Service Worker for scope ('${scopeUrl.href}') with script ('${absoluteWorkerUrl}'): Service Worker script does not exist at the given path.
 
-Did you forget to run "npx swap init <PUBLIC_DIR>"?`)
+Did you forget to run "npx msw init <PUBLIC_DIR>"?`),
+      )
     }
 
     // Fallback error message for any other registration errors.
     throw new Error(
-      `[SWAP] Failed to register a Service Worker:\n\n${error.message}`,
+      devUtils.formatMessage(
+        'Failed to register the Service Worker:\n\n%s',
+        error.message,
+      ),
     )
   }
 

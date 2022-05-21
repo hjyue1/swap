@@ -1,55 +1,58 @@
-import { OperationTypeNode } from 'graphql'
-import { Mask, ResponseWithSerializedHeaders } from '../setupWorker/glossary'
-import { set } from '../context/set'
-import { status } from '../context/status'
-import { delay } from '../context/delay'
-import { fetch } from '../context/fetch'
-import { data, DataContext } from '../context/data'
+import { DocumentNode, OperationTypeNode } from 'graphql'
+import { SerializedResponse } from '../setupWorker/glossary'
+import { data } from '../context/data'
+import { extensions } from '../context/extensions'
 import { errors } from '../context/errors'
+import { GraphQLPayloadContext } from '../typeUtils'
+import { cookie } from '../context/cookie'
 import {
+  defaultContext,
+  DefaultContext,
   MockedRequest,
   RequestHandler,
+  RequestHandlerDefaultInfo,
   ResponseResolver,
 } from './RequestHandler'
 import { getTimestamp } from '../utils/logging/getTimestamp'
 import { getStatusCodeColor } from '../utils/logging/getStatusCodeColor'
 import { prepareRequest } from '../utils/logging/prepareRequest'
 import { prepareResponse } from '../utils/logging/prepareResponse'
-import { matchRequestUrl } from '../utils/matching/matchRequestUrl'
+import { matchRequestUrl, Path } from '../utils/matching/matchRequestUrl'
 import {
   ParsedGraphQLRequest,
   GraphQLMultipartRequestBody,
   parseGraphQLRequest,
+  parseDocumentNode,
 } from '../utils/internal/parseGraphQLRequest'
 import { getPublicUrlFromRequest } from '../utils/request/getPublicUrlFromRequest'
+import { tryCatch } from '../utils/internal/tryCatch'
+import { devUtils } from '../utils/internal/devUtils'
 
 export type ExpectedOperationTypeNode = OperationTypeNode | 'all'
-export type GraphQLHandlerNameSelector = RegExp | string
+export type GraphQLHandlerNameSelector = DocumentNode | RegExp | string
 
 // GraphQL related context should contain utility functions
 // useful for GraphQL. Functions like `xml()` bear no value
 // in the GraphQL universe.
-export type GraphQLContext<QueryType> = {
-  set: typeof set
-  status: typeof status
-  delay: typeof delay
-  fetch: typeof fetch
-  data: DataContext<QueryType>
-  errors: typeof errors
-}
+export type GraphQLContext<QueryType extends Record<string, unknown>> =
+  DefaultContext & {
+    data: GraphQLPayloadContext<QueryType>
+    extensions: GraphQLPayloadContext<QueryType>
+    errors: typeof errors
+    cookie: typeof cookie
+  }
 
 export const graphqlContext: GraphQLContext<any> = {
-  set,
-  status,
-  delay,
-  fetch,
+  ...defaultContext,
   data,
+  extensions,
   errors,
+  cookie,
 }
 
 export type GraphQLVariables = Record<string, any>
 
-export interface GraphQLHandlerInfo {
+export interface GraphQLHandlerInfo extends RequestHandlerDefaultInfo {
   operationType: ExpectedOperationTypeNode
   operationName: GraphQLHandlerNameSelector
 }
@@ -70,32 +73,62 @@ export interface GraphQLRequest<Variables extends GraphQLVariables>
   variables: Variables
 }
 
+export function isDocumentNode(
+  value: DocumentNode | any,
+): value is DocumentNode {
+  if (value == null) {
+    return false
+  }
+
+  return typeof value === 'object' && 'kind' in value && 'definitions' in value
+}
+
 export class GraphQLHandler<
-  Request extends GraphQLRequest<any> = GraphQLRequest<any>
+  Request extends GraphQLRequest<any> = GraphQLRequest<any>,
 > extends RequestHandler<
   GraphQLHandlerInfo,
   Request,
   ParsedGraphQLRequest | null,
   GraphQLRequest<any>
 > {
-  private endpoint: Mask
+  private endpoint: Path
 
   constructor(
     operationType: ExpectedOperationTypeNode,
     operationName: GraphQLHandlerNameSelector,
-    endpoint: Mask,
+    endpoint: Path,
     resolver: ResponseResolver<any, any>,
   ) {
+    let resolvedOperationName = operationName
+
+    if (isDocumentNode(operationName)) {
+      const parsedNode = parseDocumentNode(operationName)
+
+      if (parsedNode.operationType !== operationType) {
+        throw new Error(
+          `Failed to create a GraphQL handler: provided a DocumentNode with a mismatched operation type (expected "${operationType}", but got "${parsedNode.operationType}").`,
+        )
+      }
+
+      if (!parsedNode.operationName) {
+        throw new Error(
+          `Failed to create a GraphQL handler: provided a DocumentNode with no operation name.`,
+        )
+      }
+
+      resolvedOperationName = parsedNode.operationName
+    }
+
     const header =
       operationType === 'all'
         ? `${operationType} (origin: ${endpoint.toString()})`
-        : `${operationType} ${operationName} (origin: ${endpoint.toString()})`
+        : `${operationType} ${resolvedOperationName} (origin: ${endpoint.toString()})`
 
     super({
       info: {
         header,
         operationType,
-        operationName,
+        operationName: resolvedOperationName,
       },
       ctx: graphqlContext,
       resolver,
@@ -105,7 +138,10 @@ export class GraphQLHandler<
   }
 
   parse(request: MockedRequest) {
-    return parseGraphQLRequest(request)
+    return tryCatch(
+      () => parseGraphQLRequest(request),
+      (error) => console.error(error.message),
+    )
   }
 
   protected getPublicRequest(
@@ -123,10 +159,10 @@ export class GraphQLHandler<
       return false
     }
 
-    if (!parsedResult.operationName) {
+    if (!parsedResult.operationName && this.info.operationType !== 'all') {
       const publicUrl = getPublicUrlFromRequest(request)
-      console.warn(`\
-[SWAP] Failed to intercept a GraphQL request at "${request.method} ${publicUrl}": unnamed GraphQL operations are not supported.
+      devUtils.warn(`\
+Failed to intercept a GraphQL request at "${request.method} ${publicUrl}": anonymous GraphQL operations are not supported.
 
 Consider naming this operation or using "graphql.operation" request handler to intercept GraphQL requests regardless of their operation name/type.
       `)
@@ -137,9 +173,10 @@ Consider naming this operation or using "graphql.operation" request handler to i
     const hasMatchingOperationType =
       this.info.operationType === 'all' ||
       parsedResult.operationType === this.info.operationType
+
     const hasMatchingOperationName =
       this.info.operationName instanceof RegExp
-        ? this.info.operationName.test(parsedResult.operationName)
+        ? this.info.operationName.test(parsedResult.operationName || '')
         : parsedResult.operationName === this.info.operationName
 
     return (
@@ -149,16 +186,25 @@ Consider naming this operation or using "graphql.operation" request handler to i
     )
   }
 
-  log(request: Request, response: ResponseWithSerializedHeaders<any>) {
+  log(
+    request: Request,
+    response: SerializedResponse,
+    handler: this,
+    parsedRequest: ParsedGraphQLRequest,
+  ) {
     const loggedRequest = prepareRequest(request)
     const loggedResponse = prepareResponse(response)
+    const statusColor = getStatusCodeColor(response.status)
+    const requestInfo = parsedRequest?.operationName
+      ? `${parsedRequest?.operationType} ${parsedRequest?.operationName}`
+      : `anonymous ${parsedRequest?.operationType}`
 
     console.groupCollapsed(
-      '[SWAP] %s %s (%c%s%c)',
+      devUtils.formatMessage('%s %s (%c%s%c)'),
       getTimestamp(),
-      this.info.operationName,
-      `color:${getStatusCodeColor(response.status)}`,
-      response.status,
+      `${requestInfo}`,
+      `color:${statusColor}`,
+      `${response.status} ${response.statusText}`,
       'color:inherit',
     )
     console.log('Request:', loggedRequest)

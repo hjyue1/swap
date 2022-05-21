@@ -1,24 +1,23 @@
 import { bold } from 'chalk'
-import * as cookieUtils from 'cookie'
+import { isNodeProcess } from '../utils/internal/isNodeProcess'
 import { StrictEventEmitter } from 'strict-event-emitter'
 import {
   createInterceptor,
   MockedResponse as MockedInterceptedResponse,
   Interceptor,
 } from '@mswjs/interceptors'
-import { getResponse } from '../utils/getResponse'
-import { parseBody } from '../utils/request/parseBody'
-import { isNodeProcess } from '../utils/internal/isNodeProcess'
 import * as requestHandlerUtils from '../utils/internal/requestHandlerUtils'
-import { onUnhandledRequest } from '../utils/request/onUnhandledRequest'
 import { ServerLifecycleEventsMap, SetupServerApi } from './glossary'
 import { SharedOptions } from '../sharedOptions'
-import { uuidv4 } from '../utils/internal/uuidv4'
-import { MockedRequest, RequestHandler } from '../handlers/RequestHandler'
-import { setRequestCookies } from '../utils/request/setRequestCookies'
-import { readResponseCookies } from '../utils/request/readResponseCookies'
+import { RequestHandler } from '../handlers/RequestHandler'
+import { parseIsomorphicRequest } from '../utils/request/parseIsomorphicRequest'
+import { handleRequest } from '../utils/handleRequest'
+import { mergeRight } from '../utils/internal/mergeRight'
+import { devUtils } from '../utils/internal/devUtils'
+import { pipeEvents } from '../utils/internal/pipeEvents'
+import { RequiredDeep } from '../typeUtils'
 
-const DEFAULT_LISTEN_OPTIONS: SharedOptions = {
+const DEFAULT_LISTEN_OPTIONS: RequiredDeep<SharedOptions> = {
   onUnhandledRequest: 'warn',
 }
 
@@ -28,6 +27,8 @@ const DEFAULT_LISTEN_OPTIONS: SharedOptions = {
  */
 export function createSetupServer(...interceptors: Interceptor[]) {
   const emitter = new StrictEventEmitter<ServerLifecycleEventsMap>()
+  const publicEmitter = new StrictEventEmitter<ServerLifecycleEventsMap>()
+  pipeEvents(emitter, publicEmitter)
 
   return function setupServer(
     ...requestHandlers: RequestHandler[]
@@ -35,126 +36,68 @@ export function createSetupServer(...interceptors: Interceptor[]) {
     requestHandlers.forEach((handler) => {
       if (Array.isArray(handler))
         throw new Error(
-          `[SWAP] Failed to call "setupServer" given an Array of request handlers (setupServer([a, b])), expected to receive each handler individually: setupServer(a, b).`,
+          devUtils.formatMessage(
+            'Failed to call "setupServer" given an Array of request handlers (setupServer([a, b])), expected to receive each handler individually: setupServer(a, b).',
+          ),
         )
-    })
-
-    // Error when attempting to run this function in a browser environment.
-    if (!isNodeProcess()) {
-      throw new Error(
-        '[SWAP] Failed to execute `setupServer` in the environment that is not Node.js (i.e. a browser). Consider using `setupWorker` instead.',
-      )
-    }
-
-    let resolvedOptions: SharedOptions = {}
-    const interceptor = createInterceptor({
-      modules: interceptors,
-      async resolver(request) {
-        const requestId = uuidv4()
-
-        if (request.headers) {
-          request.headers.set('x-swap-request-id', requestId)
-        }
-
-        const requestCookieString = request.headers.get('cookie')
-
-        const mockedRequest: MockedRequest = {
-          id: requestId,
-          url: request.url,
-          method: request.method,
-          // Parse the request's body based on the "Content-Type" header.
-          body: parseBody(request.body, request.headers),
-          headers: request.headers,
-          cookies: {},
-          redirect: 'manual',
-          referrer: '',
-          keepalive: false,
-          cache: 'default',
-          mode: 'cors',
-          referrerPolicy: 'no-referrer',
-          integrity: '',
-          destination: 'document',
-          bodyUsed: false,
-          credentials: 'same-origin',
-        }
-
-        // Attach all the cookies stored in the virtual cookie store.
-        setRequestCookies(mockedRequest)
-
-        if (requestCookieString) {
-          // Set mocked request cookies from the `cookie` header of the original request.
-          // No need to take `credentials` into account, because in Node.js requests are intercepted
-          // _after_ they happen. Request issuer should have already taken care of sending relevant cookies.
-          // Unlike browser, where interception is on the worker level, _before_ the request happens.
-          mockedRequest.cookies = cookieUtils.parse(requestCookieString)
-        }
-
-        emitter.emit('request:start', mockedRequest)
-
-        if (mockedRequest.headers.get('x-swap-bypass')) {
-          emitter.emit('request:end', mockedRequest)
-          return
-        }
-
-        const { response, handler } = await getResponse(
-          mockedRequest,
-          currentHandlers,
-        )
-
-        if (!handler) {
-          emitter.emit('request:unhandled', mockedRequest)
-
-          onUnhandledRequest(
-            mockedRequest,
-            currentHandlers,
-            resolvedOptions.onUnhandledRequest,
-          )
-        }
-
-        if (!response) {
-          emitter.emit('request:end', mockedRequest)
-          return
-        }
-
-        emitter.emit('request:match', mockedRequest)
-
-        const mockedResponse = {
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers.all(),
-          body: response.body as string,
-        }
-
-        // Store all the received response cookies in the virtual cookie store.
-        readResponseCookies(mockedRequest, response)
-
-        emitter.emit('request:end', mockedRequest)
-
-        return mockedResponse
-      },
     })
 
     // Store the list of request handlers for the current server instance,
     // so it could be modified at a runtime.
     let currentHandlers: RequestHandler[] = [...requestHandlers]
 
-    interceptor.on('response', (request, response) => {
-      const requestId = request.headers.get('x-swap-request-id')
+    // Error when attempting to run this function in a browser environment.
+    if (!isNodeProcess()) {
+      throw new Error(
+        devUtils.formatMessage(
+          'Failed to execute `setupServer` in the environment that is not Node.js (i.e. a browser). Consider using `setupWorker` instead.',
+        ),
+      )
+    }
 
-      if (!requestId) {
+    let resolvedOptions = {} as RequiredDeep<SharedOptions>
+
+    const interceptor = createInterceptor({
+      modules: interceptors,
+      async resolver(request) {
+        const mockedRequest = parseIsomorphicRequest(request)
+        return handleRequest<MockedInterceptedResponse>(
+          mockedRequest,
+          currentHandlers,
+          resolvedOptions,
+          emitter,
+          {
+            transformResponse(response) {
+              return {
+                status: response.status,
+                statusText: response.statusText,
+                headers: response.headers.all(),
+                body: response.body,
+              }
+            },
+          },
+        )
+      },
+    })
+
+    interceptor.on('response', (request, response) => {
+      if (!request.id) {
         return
       }
 
       if (response.headers.get('x-powered-by') === 'swap') {
-        emitter.emit('response:mocked', response, requestId)
+        emitter.emit('response:mocked', response, request.id)
       } else {
-        emitter.emit('response:bypass', response, requestId)
+        emitter.emit('response:bypass', response, request.id)
       }
     })
 
     return {
       listen(options) {
-        resolvedOptions = Object.assign({}, DEFAULT_LISTEN_OPTIONS, options)
+        resolvedOptions = mergeRight(
+          DEFAULT_LISTEN_OPTIONS,
+          options || {},
+        ) as RequiredDeep<SharedOptions>
         interceptor.apply()
       },
 
@@ -176,6 +119,7 @@ export function createSetupServer(...interceptors: Interceptor[]) {
       printHandlers() {
         currentHandlers.forEach((handler) => {
           const { header, callFrame } = handler.info
+
           const pragma = handler.info.hasOwnProperty('operationType')
             ? '[graphql]'
             : '[rest]'
@@ -187,12 +131,21 @@ ${bold(`${pragma} ${header}`)}
         })
       },
 
-      on(eventType, listener) {
-        emitter.addListener(eventType, listener)
+      events: {
+        on(...args) {
+          return publicEmitter.on(...args)
+        },
+        removeListener(...args) {
+          return publicEmitter.removeListener(...args)
+        },
+        removeAllListeners(...args) {
+          return publicEmitter.removeAllListeners(...args)
+        },
       },
 
       close() {
         emitter.removeAllListeners()
+        publicEmitter.removeAllListeners()
         interceptor.restore()
       },
     }

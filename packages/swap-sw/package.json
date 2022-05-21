@@ -37,6 +37,7 @@
     "cookie": "^0.4.1",
     "graphql": "^15.4.0",
     "headers-utils": "^3.0.2",
+    "headers-polyfill": "^3.0.4",
     "inquirer": "^7.3.3",
     "js-levenshtein": "^1.1.6",
     "node-fetch": "^2.6.1",

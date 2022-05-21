@@ -1,7 +1,13 @@
-import { OperationDefinitionNode, OperationTypeNode, parse } from 'graphql'
+import {
+  DocumentNode,
+  OperationDefinitionNode,
+  OperationTypeNode,
+  parse,
+} from 'graphql'
 import { GraphQLVariables } from '../../handlers/GraphQLHandler'
 import { MockedRequest } from '../../handlers/RequestHandler'
 import { getPublicUrlFromRequest } from '../request/getPublicUrlFromRequest'
+import { devUtils } from './devUtils'
 import { jsonParse } from './jsonParse'
 
 interface GraphQLInput {
@@ -15,25 +21,28 @@ export interface ParsedGraphQLQuery {
 }
 
 export type ParsedGraphQLRequest<
-  VariablesType extends GraphQLVariables = GraphQLVariables
+  VariablesType extends GraphQLVariables = GraphQLVariables,
 > =
   | (ParsedGraphQLQuery & {
       variables?: VariablesType
     })
   | undefined
 
+export function parseDocumentNode(node: DocumentNode): ParsedGraphQLQuery {
+  const operationDef = node.definitions.find((def) => {
+    return def.kind === 'OperationDefinition'
+  }) as OperationDefinitionNode
+
+  return {
+    operationType: operationDef?.operation,
+    operationName: operationDef?.name?.value,
+  }
+}
+
 function parseQuery(query: string): ParsedGraphQLQuery | Error {
   try {
     const ast = parse(query)
-
-    const operationDef = ast.definitions.find((def) => {
-      return def.kind === 'OperationDefinition'
-    }) as OperationDefinitionNode
-
-    return {
-      operationType: operationDef?.operation,
-      operationName: operationDef?.name?.value,
-    }
+    return parseDocumentNode(ast)
   } catch (error) {
     return error as Error
   }
@@ -101,11 +110,8 @@ function getGraphQLInput(request: MockedRequest<any>): GraphQLInput | null {
 
       // Handle multipart body operations.
       if (request.body?.operations) {
-        const {
-          operations,
-          map,
-          ...files
-        } = request.body as GraphQLMultipartRequestBody
+        const { operations, map, ...files } =
+          request.body as GraphQLMultipartRequestBody
         const parsedOperations =
           jsonParse<{ query?: string; variables?: GraphQLVariables }>(
             operations,
@@ -155,13 +161,14 @@ export function parseGraphQLRequest(
   if (parsedResult instanceof Error) {
     const requestPublicUrl = getPublicUrlFromRequest(request)
 
-    // Encountered a matching GraphQL request that is syntactically invalid.
-    // We may consider getting the parsing error and propagating it to the user.
-    console.error(
-      `[SWAP] Failed to intercept a GraphQL request to "${request.method} ${requestPublicUrl}": cannot parse query. See the error message from the parser below.`,
+    throw new Error(
+      devUtils.formatMessage(
+        'Failed to intercept a GraphQL request to "%s %s": cannot parse query. See the error message from the parser below.\n\n%s',
+        request.method,
+        requestPublicUrl,
+        parsedResult.message,
+      ),
     )
-    console.error(parsedResult)
-    return undefined
   }
 
   return {

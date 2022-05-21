@@ -8,12 +8,22 @@ import { isStringEqual } from '../internal/isStringEqual'
 import { RestHandler } from '../../handlers/RestHandler'
 import { GraphQLHandler } from '../../handlers/GraphQLHandler'
 import { MockedRequest, RequestHandler } from '../../handlers/RequestHandler'
+import { tryCatch } from '../internal/tryCatch'
+import { devUtils } from '../internal/devUtils'
 
 const MAX_MATCH_SCORE = 3
 const MAX_SUGGESTION_COUNT = 4
 const TYPE_MATCH_DELTA = 0.5
 
-type UnhandledRequestCallback = (request: MockedRequest) => void
+export interface UnhandledRequestPrint {
+  warning(): void
+  error(): void
+}
+
+export type UnhandledRequestCallback = (
+  request: MockedRequest,
+  print: UnhandledRequestPrint,
+) => void
 
 export type UnhandledRequestStrategy =
   | 'bypass'
@@ -21,11 +31,13 @@ export type UnhandledRequestStrategy =
   | 'error'
   | UnhandledRequestCallback
 
-function groupHandlersByType(handlers: RequestHandler[]) {
-  return handlers.reduce<{
-    rest: RestHandler[]
-    graphql: GraphQLHandler[]
-  }>(
+interface RequestHandlerGroups {
+  rest: RestHandler[]
+  graphql: GraphQLHandler[]
+}
+
+function groupHandlersByType(handlers: RequestHandler[]): RequestHandlerGroups {
+  return handlers.reduce<RequestHandlerGroups>(
     (groups, handler) => {
       if (handler instanceof RestHandler) {
         groups.rest.push(handler)
@@ -44,36 +56,46 @@ function groupHandlersByType(handlers: RequestHandler[]) {
   )
 }
 
-type RequestHandlerSuggestionList = [number, RequestHandler][]
-type ScoreGetterFn = (request: MockedRequest, handler: RequestHandler) => number
+type RequestHandlerSuggestion = [number, RequestHandler]
 
-function getScoreForRestHandler(): ScoreGetterFn {
+type ScoreGetterFn<RequestHandlerType extends RequestHandler> = (
+  request: MockedRequest,
+  handler: RequestHandlerType,
+) => number
+
+function getRestHandlerScore(): ScoreGetterFn<RestHandler> {
   return (request, handler) => {
-    const { mask, method } = handler.info
+    const { path, method } = handler.info
 
-    if (mask instanceof RegExp) {
+    if (path instanceof RegExp || method instanceof RegExp) {
       return Infinity
     }
 
     const hasSameMethod = isStringEqual(request.method, method)
+
     // Always treat a handler with the same method as a more similar one.
     const methodScoreDelta = hasSameMethod ? TYPE_MATCH_DELTA : 0
     const requestPublicUrl = getPublicUrlFromRequest(request)
-    const score = getStringMatchScore(requestPublicUrl, mask)
+    const score = getStringMatchScore(requestPublicUrl, path)
 
     return score - methodScoreDelta
   }
 }
 
-function getScoreForGraphQLHandler(
+function getGraphQLHandlerScore(
   parsedQuery: ParsedGraphQLQuery,
-): ScoreGetterFn {
+): ScoreGetterFn<GraphQLHandler> {
   return (_, handler) => {
     if (typeof parsedQuery.operationName === 'undefined') {
       return Infinity
     }
 
     const { operationType, operationName } = handler.info
+
+    if (typeof operationName !== 'string') {
+      return Infinity
+    }
+
     const hasSameOperationType = parsedQuery.operationType === operationType
     // Always treat a handler with the same operation type as a more similar one.
     const operationTypeScoreDelta = hasSameOperationType ? TYPE_MATCH_DELTA : 0
@@ -85,20 +107,16 @@ function getScoreForGraphQLHandler(
 
 function getSuggestedHandler(
   request: MockedRequest,
-  handlers: RequestHandler[],
-  getScore: ScoreGetterFn,
+  handlers: RestHandler[] | GraphQLHandler[],
+  getScore: ScoreGetterFn<RestHandler> | ScoreGetterFn<GraphQLHandler>,
 ): RequestHandler[] {
-  const suggestedHandlers = handlers
-    .reduce<RequestHandlerSuggestionList>((acc, handler) => {
-      const score = getScore(request, handler)
-      return acc.concat([[score, handler]])
+  const suggestedHandlers = (handlers as RequestHandler[])
+    .reduce<RequestHandlerSuggestion[]>((suggestions, handler) => {
+      const score = getScore(request, handler as any)
+      return suggestions.concat([[score, handler]])
     }, [])
-    .sort(([leftScore], [rightScore]) => {
-      return leftScore - rightScore
-    })
-    .filter(([score]) => {
-      return score <= MAX_MATCH_SCORE
-    })
+    .sort(([leftScore], [rightScore]) => leftScore - rightScore)
+    .filter(([score]) => score <= MAX_MATCH_SCORE)
     .slice(0, MAX_SUGGESTION_COUNT)
     .map(([, handler]) => handler)
 
@@ -121,62 +139,94 @@ export function onUnhandledRequest(
   handlers: RequestHandler[],
   strategy: UnhandledRequestStrategy = 'warn',
 ): void {
+  const parsedGraphQLQuery = tryCatch(() => parseGraphQLRequest(request))
+
+  function generateHandlerSuggestion(): string {
+    /**
+     * @note Ignore exceptions during GraphQL request parsing because at this point
+     * we cannot assume the unhandled request is a valid GraphQL request.
+     * If the GraphQL parsing fails, just don't treat it as a GraphQL request.
+     */
+    const handlerGroups = groupHandlersByType(handlers)
+    const relevantHandlers = parsedGraphQLQuery
+      ? handlerGroups.graphql
+      : handlerGroups.rest
+
+    const suggestedHandlers = getSuggestedHandler(
+      request,
+      relevantHandlers,
+      parsedGraphQLQuery
+        ? getGraphQLHandlerScore(parsedGraphQLQuery)
+        : getRestHandlerScore(),
+    )
+
+    return suggestedHandlers.length > 0
+      ? getSuggestedHandlersMessage(suggestedHandlers)
+      : ''
+  }
+
+  function generateUnhandledRequestMessage(): string {
+    const publicUrl = getPublicUrlFromRequest(request)
+    const requestHeader = parsedGraphQLQuery
+      ? `${parsedGraphQLQuery.operationType} ${parsedGraphQLQuery.operationName} (${request.method} ${publicUrl})`
+      : `${request.method} ${publicUrl}`
+    const handlerSuggestion = generateHandlerSuggestion()
+
+    const messageTemplate = [
+      `captured a request without a matching request handler:`,
+      `  \u2022 ${requestHeader}`,
+      handlerSuggestion,
+      `\
+If you still wish to intercept this unhandled request, please create a request handler for it.
+`,
+    ].filter(Boolean)
+    return messageTemplate.join('\n\n')
+  }
+
+  function applyStrategy(strategy: UnhandledRequestStrategy) {
+    // Generate handler suggestions only when applying the strategy.
+    // This saves bandwidth for scenarios when developers opt-out
+    // from the default unhandled request handling strategy.
+    const message = generateUnhandledRequestMessage()
+
+    switch (strategy) {
+      case 'error': {
+        // Print a developer-friendly error.
+        devUtils.error('Error: %s', message)
+
+        // Throw an exception to halt request processing and not perform the original request.
+        throw new Error(
+          devUtils.formatMessage(
+            'Cannot bypass a request when using the "error" strategy for the "onUnhandledRequest" option.',
+          ),
+        )
+      }
+
+      case 'warn': {
+        devUtils.warn('Warning: %s', message)
+        break
+      }
+
+      case 'bypass':
+        break
+
+      default:
+        throw new Error(
+          devUtils.formatMessage(
+            'Failed to react to an unhandled request: unknown strategy "%s". Please provide one of the supported strategies ("bypass", "warn", "error") or a custom callback function as the value of the "onUnhandledRequest" option.',
+            strategy,
+          ),
+        )
+    }
+  }
+
   if (typeof strategy === 'function') {
-    strategy(request)
+    strategy(request, {
+      warning: applyStrategy.bind(null, 'warn'),
+      error: applyStrategy.bind(null, 'error'),
+    })
     return
   }
 
-  const parsedGraphQLQuery = parseGraphQLRequest(request)
-  const handlerGroups = groupHandlersByType(handlers)
-  const relevantHandlers = parsedGraphQLQuery
-    ? handlerGroups.graphql
-    : handlerGroups.rest
-
-  const suggestedHandlers = getSuggestedHandler(
-    request,
-    relevantHandlers,
-    parsedGraphQLQuery
-      ? getScoreForGraphQLHandler(parsedGraphQLQuery)
-      : getScoreForRestHandler(),
-  )
-
-  const handlerSuggestion =
-    suggestedHandlers.length > 0
-      ? getSuggestedHandlersMessage(suggestedHandlers)
-      : ''
-
-  const publicUrl = getPublicUrlFromRequest(request)
-  const requestHeader = parsedGraphQLQuery
-    ? `${parsedGraphQLQuery.operationType} ${parsedGraphQLQuery.operationName} (${request.method} ${publicUrl})`
-    : `${request.method} ${publicUrl}`
-
-  const messageTemplate = [
-    `captured a request without a matching request handler:`,
-    `  • ${requestHeader}`,
-    handlerSuggestion,
-    `\
-If you still wish to intercept this unhandled request, please create a request handler for it.\
-`,
-  ].filter(Boolean)
-  const message = messageTemplate.join('\n\n')
-
-  switch (strategy) {
-    case 'error': {
-      console.error(`[SWAP] Error: ${message}`)
-      break
-    }
-
-    case 'warn': {
-      console.warn(`[SWAP] Warning: ${message}`)
-      break
-    }
-
-    case 'bypass':
-      break
-
-    default:
-      throw new Error(
-        `[SWAP] Failed to react to an unhandled request: unknown strategy "${strategy}". Please provide one of the supported strategies ("bypass", "warn", "error") or a custom callback function.`,
-      )
-  }
+  applyStrategy(strategy)
 }

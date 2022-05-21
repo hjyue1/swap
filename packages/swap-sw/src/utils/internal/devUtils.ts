@@ -1,6 +1,6 @@
 import { format } from 'outvariant'
 
-const LIBRARY_PREFIX = '[MSW]'
+const LIBRARY_PREFIX = '[SWAP]'
 
 /**
  * Formats a given message by appending the library's prefix string.

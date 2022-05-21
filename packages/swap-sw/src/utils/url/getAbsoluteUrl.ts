@@ -1,15 +1,26 @@
-import { Mask } from '../../setupWorker/glossary'
+import { isAbsoluteUrl } from './isAbsoluteUrl'
 
 /**
- * Returns an absolute URL based on the given relative URL, if possible.
- * Ignores regular expressions.
+ * Returns an absolute URL based on the given path.
  */
-export const getAbsoluteUrl = <T extends Mask>(mask: T): T => {
-  // Global `location` object doesn't exist in Node.
-  // Relative request predicate URL cannot become absolute.
-  const hasLocation = typeof location !== 'undefined'
+export function getAbsoluteUrl(path: string, baseUrl?: string): string {
+  // already absolute URL
+  if (isAbsoluteUrl(path)) {
+    return path
+  }
 
-  return typeof mask === 'string' && mask.startsWith('/')
-    ? ((`${hasLocation ? location.origin : ''}${mask}` as string) as T)
-    : mask
+  // Ignore path with pattern start with *
+  if (path.startsWith('*')) {
+    return path
+  }
+
+  // Resolve a relative request URL against a given custom "baseUrl"
+  // or the document baseURI (in the case of browser/browser-like environments).
+  const origin =
+    baseUrl || (typeof document !== 'undefined' && document.baseURI)
+
+  return origin
+    ? // Encode and decode the path to preserve escaped characters.
+      decodeURI(new URL(encodeURI(path), origin).href)
+    : path
 }

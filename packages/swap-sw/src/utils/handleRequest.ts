@@ -9,6 +9,7 @@ import { ResponseLookupResult, getResponse } from './getResponse'
 import { devUtils } from './internal/devUtils'
 import { onUnhandledRequest } from './request/onUnhandledRequest'
 import { readResponseCookies } from './request/readResponseCookies'
+import { isBypass } from '../utils/matching/bypassUrl'
 
 export interface HandleRequestOptions<ResponseType> {
   /**
@@ -59,7 +60,23 @@ export async function handleRequest<
   emitter.emit('request:start', request)
 
   // Perform bypassed requests (i.e. issued via "ctx.fetch") as-is.
-  if (request.headers.get('x-swap-bypass') === 'true') {
+  if (
+    request.headers.get('x-swap-bypass') === 'true' ||
+    isBypass(request.url.href)
+  ) {
+    emitter.emit('request:end', request)
+    handleRequestOptions?.onPassthroughResponse?.(request)
+    return
+  }
+
+  if (
+    (options.bypassMode === 'api' &&
+      request.headers?.get('x-swap-jsbridge') !== 'true') ||
+    (options.bypassMode === 'jsbridge' &&
+      request.headers?.get('x-swap-jsbridge') === 'true')
+  ) {
+    onUnhandledRequest(request, handlers, options.onUnhandledRequest)
+    emitter.emit('request:unhandled', request)
     emitter.emit('request:end', request)
     handleRequestOptions?.onPassthroughResponse?.(request)
     return

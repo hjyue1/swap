@@ -5,11 +5,15 @@ import {
   RequestHandlerExecutionResult,
 } from '../handlers/RequestHandler'
 
-interface ResponsePayload {
+export interface ResponseLookupResult {
   handler?: RequestHandler
   publicRequest?: any
   parsedRequest?: any
   response?: MockedResponse
+}
+
+export interface ResponseResolutionContext {
+  baseUrl?: string
 }
 
 /**
@@ -17,13 +21,14 @@ interface ResponsePayload {
  */
 export const getResponse = async <
   Request extends MockedRequest,
-  Handler extends RequestHandler[]
+  Handler extends RequestHandler[],
 >(
   request: Request,
   handlers: Handler,
-): Promise<ResponsePayload> => {
+  resolutionContext?: ResponseResolutionContext,
+): Promise<ResponseLookupResult> => {
   const relevantHandlers = handlers.filter((handler) => {
-    return handler.test(request)
+    return handler.test(request, resolutionContext)
   })
 
   if (relevantHandlers.length === 0) {
@@ -35,14 +40,14 @@ export const getResponse = async <
 
   const result = await relevantHandlers.reduce<
     Promise<RequestHandlerExecutionResult<any> | null>
-  >(async (acc, handler) => {
-    const previousResults = await acc
+  >(async (executionResult, handler) => {
+    const previousResults = await executionResult
 
     if (!!previousResults?.response) {
-      return acc
+      return executionResult
     }
 
-    const result = await handler.run(request)
+    const result = await handler.run(request, resolutionContext)
 
     if (result === null || result.handler.shouldSkip) {
       return null

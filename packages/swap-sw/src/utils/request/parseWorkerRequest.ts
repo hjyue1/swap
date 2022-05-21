@@ -1,14 +1,19 @@
-import { Headers } from 'headers-utils'
-import { MockedRequest } from '../../handlers/RequestHandler'
+import { Headers } from 'headers-polyfill'
+import { passthrough } from '../../handlers/RequestHandler'
+import { RestRequest } from '../../handlers/RestHandler'
 import { ServiceWorkerIncomingRequest } from '../../setupWorker/glossary'
 import { setRequestCookies } from './setRequestCookies'
 import { parseBody } from './parseBody'
 import { pruneGetRequestBody } from './pruneGetRequestBody'
 
+/**
+ * Converts a given request received from the Service Worker
+ * into a `MockedRequest` instance.
+ */
 export function parseWorkerRequest(
   rawRequest: ServiceWorkerIncomingRequest,
-): MockedRequest {
-  const request = {
+): RestRequest {
+  const request: RestRequest = {
     id: rawRequest.id,
     cache: rawRequest.cache,
     credentials: rawRequest.credentials,
@@ -26,13 +31,14 @@ export function parseWorkerRequest(
     body: pruneGetRequestBody(rawRequest),
     bodyUsed: rawRequest.bodyUsed,
     headers: new Headers(rawRequest.headers),
+    passthrough,
   }
 
   // Set document cookies on the request.
   setRequestCookies(request)
 
   // Parse the request's body based on the "Content-Type" header.
-  request.body = parseBody(request.body, request.headers) as any
+  request.body = parseBody(request.body, request.headers)
 
   return request
 }

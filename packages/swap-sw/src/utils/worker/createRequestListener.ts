@@ -1,7 +1,6 @@
-import { headersToList } from 'headers-utils'
 import {
   StartOptions,
-  ResponseWithSerializedHeaders,
+  SerializedResponse,
   SetupWorkerInternalContext,
   ServiceWorkerIncomingEventsMap,
 } from '../../setupWorker/glossary'
@@ -9,17 +8,15 @@ import {
   ServiceWorkerMessage,
   createBroadcastChannel,
 } from '../createBroadcastChannel'
-import { getResponse } from '../getResponse'
-import { onUnhandledRequest } from '../request/onUnhandledRequest'
 import { NetworkError } from '../NetworkError'
 import { parseWorkerRequest } from '../request/parseWorkerRequest'
-import { readResponseCookies } from '../request/readResponseCookies'
-import { setRequestCookies } from '../request/setRequestCookies'
-import { isBypass } from '../../utils/matching/bypassUrl'
+import { handleRequest } from '../handleRequest'
+import { RequestHandler } from '../../handlers/RequestHandler'
+import { RequiredDeep } from '../../typeUtils'
 
 export const createRequestListener = (
   context: SetupWorkerInternalContext,
-  options: StartOptions,
+  options: RequiredDeep<StartOptions>,
 ) => {
   return async (
     event: MessageEvent,
@@ -32,117 +29,45 @@ export const createRequestListener = (
 
     try {
       const request = parseWorkerRequest(message.payload)
-      context.emitter.emit('request:start', request)
-
-      // Set document cookies on the request.
-      setRequestCookies(request)
-
-      if (
-        options.bypassMode === 'api' &&
-        request.headers?.get('x-swap-jsbridge') !== 'true'
-      ) {
-        onUnhandledRequest(
-          request,
-          context.requestHandlers,
-          options.onUnhandledRequest,
-        )
-
-        return channel.send({ type: 'MOCK_NOT_FOUND' })
-      }
-
-      if (
-        options.bypassMode === 'jsbridge' &&
-        request.headers?.get('x-swap-jsbridge') === 'true'
-      ) {
-        onUnhandledRequest(
-          request,
-          context.requestHandlers,
-          options.onUnhandledRequest,
-        )
-
-        return channel.send({ type: 'MOCK_NOT_FOUND' })
-      }
-
-      if (isBypass(request.url.href)) {
-        return channel.send({ type: 'MOCK_BY_PASS' })
-      }
-
-      const {
-        response,
-        handler,
-        publicRequest,
-        parsedRequest,
-      } = await getResponse(request, context.requestHandlers)
-
-      // Handle a scenario when there is no request handler
-      // found for a given request.
-      if (!handler) {
-        if (!options.isOnline) {
-          onUnhandledRequest(
-            request,
-            context.requestHandlers,
-            options.onUnhandledRequest,
-          )
-        }
-        
-        context.emitter.emit('request:unhandled', request)
-        context.emitter.emit('request:end', request)
-
-        return channel.send({
-          type: 'MOCK_NOT_FOUND',
-          payload: {
-            baseURL: options.baseURL,
+      await handleRequest<SerializedResponse>(
+        request,
+        context.requestHandlers,
+        options,
+        context.emitter,
+        {
+          transformResponse(response) {
+            return {
+              ...response,
+              headers: response.headers.all(),
+            }
           },
-        })
-      }
-
-      context.emitter.emit('request:match', request)
-
-      // Handle a scenario when there is a request handler,
-      // but it doesn't return any mocked response.
-      if (!response) {
-        if (!options.isOnline) {
-          console.warn(
-            '[SWAP] Expected a mocking resolver function to return a mocked response Object, but got: %s. Original response is going to be used instead.',
+          onPassthroughResponse() {
+            return channel.send({
+              type: 'MOCK_NOT_FOUND',
+            })
+          },
+          onMockedResponse(response) {
+            channel.send({
+              type: 'MOCK_SUCCESS',
+              payload: response,
+            })
+          },
+          onMockedResponseSent(
             response,
-          )
-        }
-
-        context.emitter.emit('request:end', request)
-
-        return channel.send({ 
-          type: 'MOCK_NOT_FOUND',
-          payload: {
-            baseURL: options.baseURL,
-          }
-        })
-      }
-
-      readResponseCookies(request, response)
-
-      const responseWithSerializedHeaders: ResponseWithSerializedHeaders = {
-        ...response,
-        headers: headersToList(response.headers),
-      }
-
-      if (!options.quiet) {
-        setTimeout(() => {
-          handler.log(
-            publicRequest,
-            responseWithSerializedHeaders,
-            handler,
-            parsedRequest,
-          )
-        }, response.delay)
-      }
-
-      context.emitter.emit('request:end', request)
-
-      channel.send({
-        type: 'MOCK_SUCCESS',
-        payload: responseWithSerializedHeaders,
-      })
-    } catch (error:any) {
+            { handler, publicRequest, parsedRequest },
+          ) {
+            if (!options.quiet) {
+              handler.log(
+                publicRequest,
+                response,
+                handler as RequestHandler,
+                parsedRequest,
+              )
+            }
+          },
+        },
+      )
+    } catch (error) {
       if (error instanceof NetworkError) {
         // Treat emulated network error differently,
         // as it is an intended exception in a request handler.
@@ -155,19 +80,21 @@ export const createRequestListener = (
         })
       }
 
-      // Treat all the other exceptions in a request handler
-      // as unintended, alerting that there is a problem needs fixing.
-      channel.send({
-        type: 'INTERNAL_ERROR',
-        payload: {
-          status: 500,
-          body: JSON.stringify({
-            errorType: error.constructor.name,
-            message: error.message,
-            location: error.stack,
-          }),
-        },
-      })
+      if (error instanceof Error) {
+        // Treat all the other exceptions in a request handler
+        // as unintended, alerting that there is a problem needs fixing.
+        channel.send({
+          type: 'INTERNAL_ERROR',
+          payload: {
+            status: 500,
+            body: JSON.stringify({
+              errorType: error.constructor.name,
+              message: error.message,
+              location: error.stack,
+            }),
+          },
+        })
+      }
     }
   }
 }

@@ -12,7 +12,7 @@ export function getRequestCookies(request: MockedRequest) {
   /**
    * @note No cookies persist on the document in Node.js: no document.
    */
-  if (typeof location === 'undefined') {
+  if (typeof document === 'undefined' || typeof location === 'undefined') {
     return {}
   }
 

@@ -1,9 +1,10 @@
 const path = require('path')
+const packageJson = require('../package.json');
 
 const SERVICE_WORKER_SOURCE_PATH = path.resolve(
   __dirname,
   '../',
-  'node_modules/swap-sw/lib/esm',
+  'node_modules/swap-sw/lib',
   'swapSW.js',
 )
 

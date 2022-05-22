@@ -1,1 +1,100 @@
-import{g as r,_ as e,p as s,s as o}from"./jsbridge-deps.js";export{a as swapCall,b as swapCallWithPromise}from"./jsbridge-deps.js";import{rest as t,setupWorker as n}from"swap-sw";import{setupServer as i}from"swap-sw/node";export{waitFor}from"./waitFor.js";import"swap-jsbridge";import"axios";var c=function(r){var e=[];return Object.entries(r).forEach((function(r){var s=r[0],o=r[1],n=p(s),a=n.method,i=n.url;t[a]?"function"==typeof o?e.push(t[a](i,o)):e.push(t[a](i,(function(r,e,s){return e(s.status(200),s.json(o))}))):console.error("".concat(s,"无效字段"))})),e},p=function(r){var e=r.split(" "),s=e[0],o=e[1];return{method:s.toLowerCase(),url:o}},u=function(){n().stop()},f=function(o){if(s(e({isMock:!0},o)),r("isMock"))return function(){if("JEST"!==r("mode")){var s=c(r("mockData")),o=n.apply(void 0,s),t=r(),a=t.workerOpt,i=t.bypassMode,p=t.isOnline,u=t.baseURL;o.start(e({bypassMode:i,isOnline:p,baseURL:u},a))}}();u()},l=u,d=function(e){var t=e.isMock,n=void 0===t||t,a=e.mockData;process.env.isJest="true",s({mockData:a,isMock:n,mode:"JEST"});var p=c(r("mockData")),u=i.apply(void 0,p);return o("swapJestServer",u),u},m=function(){var e=r("swapJestServer");e.listen&&e.resetHandlers&&e.close&&(beforeAll((function(){return e.listen()})),afterEach((function(){return e.resetHandlers()})),afterAll((function(){return e.close()})))},v=function(){return r("swapJestServer")},w=function(){n().restoreHandlers()},k=function(){n().resetHandlers()};export{v as getSwapJestServer,f as swapInit,d as swapJestInit,m as swapJestListen,k as swapResetHandlers,w as swapRestoreHandlers,l as swapStop};
+import { g as getStore, p as patchSetStore, s as setStore } from './jsbridge-deps.js';
+export { a as swapCall, b as swapCallWithPromise } from './jsbridge-deps.js';
+import { rest, setupWorker } from 'swap-sw';
+import { setupServer } from 'swap-sw/node';
+export { waitFor } from './waitFor.js';
+import 'swap-jsbridge';
+import 'axios';
+
+/**
+ * 转换mockdata数据结构
+ * @param {mockDataType} mockData
+ * @returns {Array}
+ */
+const transform = function (mockData) {
+    const handlers = [];
+    Object.entries(mockData).forEach(([key, mockHandle]) => {
+        const { method, url } = analysisKey(key);
+        if (!rest[method]) {
+            console.error(`${key}无效字段`);
+            return;
+        }
+        if (typeof mockHandle === 'function') {
+            handlers.push(rest[method](url, mockHandle));
+        }
+        else {
+            handlers.push(rest[method](url, (req, res, ctx) => res(ctx.status(200), ctx.json(mockHandle))));
+        }
+    });
+    return handlers;
+};
+const analysisKey = function (key) {
+    const [method, url] = key.split(' ');
+    return {
+        method: method.toLowerCase(),
+        url,
+    };
+};
+
+const workerStart = function () {
+    if (getStore('mode') === 'JEST')
+        return;
+    const handlers = transform(getStore('mockData'));
+    const sw = setupWorker(...handlers);
+    const { workerOpt, bypassMode, isOnline, baseURL } = getStore();
+    sw.start(Object.assign({ bypassMode,
+        isOnline,
+        baseURL }, workerOpt));
+};
+const workerStop = function () {
+    setupWorker().stop();
+};
+const workerRestoreHandlers = function () {
+    setupWorker().restoreHandlers();
+};
+const workerResetHandlers = function () {
+    setupWorker().resetHandlers();
+};
+
+/**
+ * swap 入口 api
+ * @param opts
+ * @returns
+ */
+const swapInit = (opts) => {
+    patchSetStore(Object.assign({ isMock: true }, opts));
+    if (getStore('isMock'))
+        return workerStart();
+    workerStop();
+};
+const swapStop = workerStop;
+
+// eslint-disable-next-line no-unused-vars
+const swapJestInit = function ({ isMock = true, mockData }) {
+    process.env.isJest = 'true';
+    patchSetStore({
+        mockData,
+        isMock,
+        mode: 'JEST',
+    });
+    const handlers = transform(getStore('mockData'));
+    const server = setupServer(...handlers);
+    setStore('swapJestServer', server);
+    return server;
+};
+const swapJestListen = function () {
+    const swapServer = getStore('swapJestServer');
+    if (!swapServer.listen || !swapServer.resetHandlers || !swapServer.close)
+        return;
+    beforeAll(() => swapServer.listen());
+    afterEach(() => swapServer.resetHandlers());
+    afterAll(() => swapServer.close());
+};
+
+const getSwapJestServer = function () {
+    return getStore('swapJestServer');
+};
+const swapRestoreHandlers = workerRestoreHandlers;
+const swapResetHandlers = workerResetHandlers;
+
+export { getSwapJestServer, swapInit, swapJestInit, swapJestListen, swapResetHandlers, swapRestoreHandlers, swapStop };

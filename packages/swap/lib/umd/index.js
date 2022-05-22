@@ -1,1 +1,251 @@
-!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports,require("swap-sw"),require("swap-sw/node"),require("swap-jsbridge"),require("axios")):"function"==typeof define&&define.amd?define(["exports","swap-sw","swap-sw/node","swap-jsbridge","axios"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).swapSW={},e["swap-sw"],e["swap-sw"],e["swap-jsbridge"],e.axios)}(this,(function(e,t,n,r,o){"use strict";function s(e){return e&&"object"==typeof e&&"default"in e?e:{default:e}}var a=s(o),i={mode:"MOCK",isMock:!1,bypassMode:"none",mockData:{},unmatchedMock:{code:999,msg:"没有匹配到数据"},swapJestServer:{},workerOpt:null,isOnline:!1,baseURL:""},u=function(e){return e?i[e]:i},c=function(e,t){return i[e]=t,i},l=function(e){return Object.entries(e).forEach((function(e){var t=e[0],n=e[1];c(t,n)})),i},f=function(){return f=Object.assign||function(e){for(var t,n=1,r=arguments.length;n<r;n++)for(var o in t=arguments[n])Object.prototype.hasOwnProperty.call(t,o)&&(e[o]=t[o]);return e},f.apply(this,arguments)};function p(e,t,n,r){return new(n||(n=Promise))((function(o,s){function a(e){try{u(r.next(e))}catch(e){s(e)}}function i(e){try{u(r.throw(e))}catch(e){s(e)}}function u(e){var t;e.done?o(e.value):(t=e.value,t instanceof n?t:new n((function(e){e(t)}))).then(a,i)}u((r=r.apply(e,t||[])).next())}))}function d(e,t){var n,r,o,s,a={label:0,sent:function(){if(1&o[0])throw o[1];return o[1]},trys:[],ops:[]};return s={next:i(0),throw:i(1),return:i(2)},"function"==typeof Symbol&&(s[Symbol.iterator]=function(){return this}),s;function i(s){return function(i){return function(s){if(n)throw new TypeError("Generator is already executing.");for(;a;)try{if(n=1,r&&(o=2&s[0]?r.return:s[0]?r.throw||((o=r.return)&&o.call(r),0):r.next)&&!(o=o.call(r,s[1])).done)return o;switch(r=0,o&&(s=[2&s[0],o.value]),s[0]){case 0:case 1:o=s;break;case 4:return a.label++,{value:s[1],done:!1};case 5:a.label++,r=s[1],s=[0];continue;case 7:s=a.ops.pop(),a.trys.pop();continue;default:if(!(o=a.trys,(o=o.length>0&&o[o.length-1])||6!==s[0]&&2!==s[0])){a=0;continue}if(3===s[0]&&(!o||s[1]>o[0]&&s[1]<o[3])){a.label=s[1];break}if(6===s[0]&&a.label<o[1]){a.label=o[1],o=s;break}if(o&&a.label<o[2]){a.label=o[2],a.ops.push(s);break}o[2]&&a.ops.pop(),a.trys.pop();continue}s=t.call(e,a)}catch(e){s=[6,e],r=0}finally{n=o=0}if(5&s[0])throw s[1];return{value:s[0]?s[1]:void 0,done:!0}}([s,i])}}}function w(e,t,n){if(n||2===arguments.length)for(var r,o=0,s=t.length;o<s;o++)!r&&o in t||(r||(r=Array.prototype.slice.call(t,0,o)),r[o]=t[o]);return e.concat(r||Array.prototype.slice.call(t))}var h=function(e){var n=[];return Object.entries(e).forEach((function(e){var r=e[0],o=e[1],s=v(r),a=s.method,i=s.url;t.rest[a]?"function"==typeof o?n.push(t.rest[a](i,o)):n.push(t.rest[a](i,(function(e,t,n){return t(n.status(200),n.json(o))}))):console.error("".concat(r,"无效字段"))})),n},v=function(e){var t=e.split(" "),n=t[0],r=t[1];return{method:n.toLowerCase(),url:r}},b=function(){t.setupWorker().stop()},y=b,m=function(e,t,n){return p(this,void 0,void 0,(function(){return d(this,(function(r){switch(r.label){case 0:return[4,a.default.create({baseURL:e,timeout:2e4,withCredentials:!1,headers:{"x-swap-jsbridge":"true"}}).get(t,{params:n})];case 1:return[2,r.sent().data]}}))}))};var k=function(e,t){return p(this,void 0,void 0,(function(){var n,r,o;return d(this,(function(s){switch(s.label){case 0:return n=e.split("://"),r=n[0],o=n[1],[4,m(r,"/".concat(o),t)];case 1:return[2,s.sent()]}}))}))},g=function(e){return function(t,n){for(var r=[],o=2;o<arguments.length;o++)r[o-2]=arguments[o];return p(this,void 0,void 0,(function(){var o,s,a;return d(this,(function(i){switch(i.label){case 0:return o=u(),s=o.isMock,a=o.bypassMode,s&&["api","none"].includes(a)?[4,k(t,n).catch((function(){return{}}))]:[3,2];case 1:return[2,i.sent()];case 2:return[2,e.call.apply(e,w([this,t,n],r,!1))]}}))}))}},S=g(r.call),x=g(r.callWithPromise),M="function"==typeof setImmediate?setImmediate:setTimeout,j=function(){t.setupWorker().restoreHandlers()},O=function(){t.setupWorker().resetHandlers()};e.getSwapJestServer=function(){return u("swapJestServer")},e.swapCall=S,e.swapCallWithPromise=x,e.swapInit=function(e){if(l(f({isMock:!0},e)),u("isMock"))return function(){if("JEST"!==u("mode")){var e=h(u("mockData")),n=t.setupWorker.apply(void 0,e),r=u(),o=r.workerOpt,s=r.bypassMode,a=r.isOnline,i=r.baseURL;n.start(f({bypassMode:s,isOnline:a,baseURL:i},o))}}();b()},e.swapJestInit=function(e){var t=e.isMock,r=void 0===t||t,o=e.mockData;process.env.isJest="true",l({mockData:o,isMock:r,mode:"JEST"});var s=h(u("mockData")),a=n.setupServer.apply(void 0,s);return c("swapJestServer",a),a},e.swapJestListen=function(){var e=u("swapJestServer");e.listen&&e.resetHandlers&&e.close&&(beforeAll((function(){return e.listen()})),afterEach((function(){return e.resetHandlers()})),afterAll((function(){return e.close()})))},e.swapResetHandlers=O,e.swapRestoreHandlers=j,e.swapStop=y,e.waitFor=function(){return new Promise((function(e){M(e)}))}}));
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('swap-sw'), require('swap-sw/node'), require('swap-jsbridge'), require('axios')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'swap-sw', 'swap-sw/node', 'swap-jsbridge', 'axios'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.swapSW = {}, global["swap-sw"], global["swap-sw"], global["swap-jsbridge"], global.axios));
+})(this, (function (exports, swapSw, node, swapJsbridge, axios) { 'use strict';
+
+  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+  var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
+
+  const mode = 'MOCK';
+  const isMock = false;
+  const isOnline = false;
+  const baseURL = '';
+  const bypassMode = 'none';
+  const workerOpt = null;
+  const mockData = {};
+  const swapJestServer = {};
+  const unmatchedMock = {
+      code: 999,
+      msg: '没有匹配到数据',
+  };
+
+  const store = {
+      mode,
+      isMock,
+      bypassMode,
+      mockData,
+      unmatchedMock,
+      swapJestServer,
+      workerOpt,
+      isOnline,
+      baseURL,
+  };
+  /**
+   * 获取store中的值，如果没有入参则返回所有
+   * @param key
+   * @returns
+   */
+  const getStore = function (key) {
+      if (key) {
+          return store[key];
+      }
+      return store;
+  };
+  /**
+   * 设置store，并返回store
+   * @param {string} key
+   * @param {any} value
+   * @returns
+   */
+  const setStore = function (key, val) {
+      store[key] = val;
+      return store;
+  };
+  /**
+   * 批处理设置store，并返回store
+   * @param {string} key
+   * @param {any} value
+   * @returns
+   */
+  const patchSetStore = function (obj) {
+      Object.entries(obj).forEach(([key, val]) => {
+          setStore(key, val);
+      });
+      return store;
+  };
+
+  /**
+   * 转换mockdata数据结构
+   * @param {mockDataType} mockData
+   * @returns {Array}
+   */
+  const transform = function (mockData) {
+      const handlers = [];
+      Object.entries(mockData).forEach(([key, mockHandle]) => {
+          const { method, url } = analysisKey(key);
+          if (!swapSw.rest[method]) {
+              console.error(`${key}无效字段`);
+              return;
+          }
+          if (typeof mockHandle === 'function') {
+              handlers.push(swapSw.rest[method](url, mockHandle));
+          }
+          else {
+              handlers.push(swapSw.rest[method](url, (req, res, ctx) => res(ctx.status(200), ctx.json(mockHandle))));
+          }
+      });
+      return handlers;
+  };
+  const analysisKey = function (key) {
+      const [method, url] = key.split(' ');
+      return {
+          method: method.toLowerCase(),
+          url,
+      };
+  };
+
+  const workerStart = function () {
+      if (getStore('mode') === 'JEST')
+          return;
+      const handlers = transform(getStore('mockData'));
+      const sw = swapSw.setupWorker(...handlers);
+      const { workerOpt, bypassMode, isOnline, baseURL } = getStore();
+      sw.start(Object.assign({ bypassMode,
+          isOnline,
+          baseURL }, workerOpt));
+  };
+  const workerStop = function () {
+      swapSw.setupWorker().stop();
+  };
+  const workerRestoreHandlers = function () {
+      swapSw.setupWorker().restoreHandlers();
+  };
+  const workerResetHandlers = function () {
+      swapSw.setupWorker().resetHandlers();
+  };
+
+  /**
+   * swap 入口 api
+   * @param opts
+   * @returns
+   */
+  const swapInit = (opts) => {
+      patchSetStore(Object.assign({ isMock: true }, opts));
+      if (getStore('isMock'))
+          return workerStart();
+      workerStop();
+  };
+  const swapStop = workerStop;
+
+  // eslint-disable-next-line no-unused-vars
+  const swapJestInit = function ({ isMock = true, mockData }) {
+      process.env.isJest = 'true';
+      patchSetStore({
+          mockData,
+          isMock,
+          mode: 'JEST',
+      });
+      const handlers = transform(getStore('mockData'));
+      const server = node.setupServer(...handlers);
+      setStore('swapJestServer', server);
+      return server;
+  };
+  const swapJestListen = function () {
+      const swapServer = getStore('swapJestServer');
+      if (!swapServer.listen || !swapServer.resetHandlers || !swapServer.close)
+          return;
+      beforeAll(() => swapServer.listen());
+      afterEach(() => swapServer.resetHandlers());
+      afterAll(() => swapServer.close());
+  };
+
+  /******************************************************************************
+  Copyright (c) Microsoft Corporation.
+
+  Permission to use, copy, modify, and/or distribute this software for any
+  purpose with or without fee is hereby granted.
+
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+  PERFORMANCE OF THIS SOFTWARE.
+  ***************************************************************************** */
+
+  function __awaiter(thisArg, _arguments, P, generator) {
+      function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+      return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+          function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+          function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+  }
+
+  const request = function (baseURL, url, params) {
+      return __awaiter(this, void 0, void 0, function* () {
+          const instance = axios__default["default"].create({
+              baseURL,
+              timeout: 20000,
+              withCredentials: false,
+              headers: { 'x-swap-jsbridge': 'true' },
+          });
+          const res = yield instance.get(url, { params });
+          return res.data;
+      });
+  };
+
+  /**
+  * @description 获取URL名称
+  * @param {string} baseUrl
+  * @returns {string}
+  */
+  function getURLName(baseUrl) {
+      return baseUrl.split('://');
+  }
+  /**
+  * @description 处理请求
+  * @returns {string}
+  */
+  const handlerRequest = function (url, param) {
+      return __awaiter(this, void 0, void 0, function* () {
+          const [pre, name] = getURLName(url);
+          return yield request(pre, `/${name}`, param);
+      });
+  };
+
+  const wrapperCall = function (target) {
+      return function (scheme, param, ...extendOpt) {
+          return __awaiter(this, void 0, void 0, function* () {
+              const { isMock, bypassMode } = getStore();
+              if (isMock && (['api', 'none'].includes(bypassMode))) {
+                  // jsbridge transform fetch
+                  // 如果没有命中mock data则返回空对象
+                  return yield handlerRequest(scheme, param).catch(() => ({}));
+              }
+              return target.call(this, scheme, param, ...extendOpt);
+          });
+      };
+  };
+  const swapCall = wrapperCall(swapJsbridge.call);
+  const swapCallWithPromise = wrapperCall(swapJsbridge.callWithPromise);
+
+  const scheduler = typeof setImmediate === 'function' ? setImmediate : setTimeout;
+  const waitFor = function () {
+      return new Promise((resolve) => {
+          scheduler(resolve);
+      });
+  };
+
+  const getSwapJestServer = function () {
+      return getStore('swapJestServer');
+  };
+  const swapRestoreHandlers = workerRestoreHandlers;
+  const swapResetHandlers = workerResetHandlers;
+
+  exports.getSwapJestServer = getSwapJestServer;
+  exports.swapCall = swapCall;
+  exports.swapCallWithPromise = swapCallWithPromise;
+  exports.swapInit = swapInit;
+  exports.swapJestInit = swapJestInit;
+  exports.swapJestListen = swapJestListen;
+  exports.swapResetHandlers = swapResetHandlers;
+  exports.swapRestoreHandlers = swapRestoreHandlers;
+  exports.swapStop = swapStop;
+  exports.waitFor = waitFor;
+
+}));

@@ -144,7 +144,7 @@ export type ServiceWorkerInstanceTuple = [
 
 export type FindWorker = (
   scriptUrl: string,
-  mockServiceWorkerUrl: string,
+  swapSWUrl: string,
 ) => boolean
 
 export interface StartOptions extends SharedOptions {
@@ -154,7 +154,7 @@ export interface StartOptions extends SharedOptions {
   serviceWorker?: {
     /**
      * Custom url to the worker script.
-     * @default "./mockServiceWorker.js"
+     * @default "./swapSW.js"
      */
     url?: string
     options?: RegistrationOptions

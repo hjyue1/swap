@@ -28,7 +28,7 @@ export default defineConfig([
     legacyOutput: true,
     format: ['iife'],
     platform: 'browser',
-    globalName: 'MockServiceWorker',
+    globalName: 'swapSW',
     bundle: true,
     sourcemap: true,
     splitting: false,

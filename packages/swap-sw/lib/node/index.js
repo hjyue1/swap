@@ -21,13 +21,6 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-}) : x)(function(x) {
-  if (typeof require !== "undefined")
-    return require.apply(this, arguments);
-  throw new Error('Dynamic require of "' + x + '" is not supported');
-});
 var __objRest = (source, exclude) => {
   var target = {};
   for (var prop in source)
@@ -43,7 +36,7 @@ var __objRest = (source, exclude) => {
 var __esm = (fn, res) => function __init() {
   return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
-var __commonJS = (cb, mod) => function __require2() {
+var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 var __export = (target, all) => {
@@ -59,10 +52,20 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// node_modules/tsup/assets/esm_shims.js
-var init_esm_shims = __esm({
-  "node_modules/tsup/assets/esm_shims.js"() {
+// node_modules/tsup/assets/cjs_shims.js
+var init_cjs_shims = __esm({
+  "node_modules/tsup/assets/cjs_shims.js"() {
+  }
+});
+
+// config/polyfills-node.ts
+var import_timers, setTimeout;
+var init_polyfills_node = __esm({
+  "config/polyfills-node.ts"() {
+    import_timers = require("timers");
+    setTimeout = import_timers.setTimeout;
   }
 });
 
@@ -70,7 +73,8 @@ var init_esm_shims = __esm({
 var require_format = __commonJS({
   "node_modules/outvariant/lib/format.js"(exports) {
     "use strict";
-    init_esm_shims();
+    init_cjs_shims();
+    init_polyfills_node();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.format = void 0;
     var POSITIONALS_EXP = /(%?)(%([sdjo]))/g;
@@ -127,7 +131,8 @@ var require_format = __commonJS({
 var require_invariant = __commonJS({
   "node_modules/outvariant/lib/invariant.js"(exports) {
     "use strict";
-    init_esm_shims();
+    init_cjs_shims();
+    init_polyfills_node();
     var __extends = exports && exports.__extends || function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
@@ -216,7 +221,8 @@ var require_invariant = __commonJS({
 var require_lib = __commonJS({
   "node_modules/outvariant/lib/index.js"(exports) {
     "use strict";
-    init_esm_shims();
+    init_cjs_shims();
+    init_polyfills_node();
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
@@ -239,48 +245,165 @@ var require_lib = __commonJS({
   }
 });
 
-// src/index.ts
-init_esm_shims();
-
-// src/context/index.ts
-var context_exports = {};
-__export(context_exports, {
-  body: () => body,
-  cookie: () => cookie,
-  data: () => data,
-  delay: () => delay,
-  errors: () => errors,
-  extensions: () => extensions,
-  fetch: () => fetch,
-  json: () => json,
-  set: () => set,
-  status: () => status,
-  text: () => text,
-  xml: () => xml
+// src/node/index.ts
+var node_exports = {};
+__export(node_exports, {
+  setupServer: () => setupServer
 });
-init_esm_shims();
+module.exports = __toCommonJS(node_exports);
+init_cjs_shims();
+init_polyfills_node();
+
+// src/node/setupServer.ts
+init_cjs_shims();
+init_polyfills_node();
+var import_ClientRequest = require("@mswjs/interceptors/lib/interceptors/ClientRequest");
+var import_XMLHttpRequest = require("@mswjs/interceptors/lib/interceptors/XMLHttpRequest");
+
+// src/node/createSetupServer.ts
+init_cjs_shims();
+init_polyfills_node();
+var import_chalk = require("chalk");
+var import_is_node_process3 = require("is-node-process");
+var import_strict_event_emitter = require("strict-event-emitter");
+var import_interceptors = require("@mswjs/interceptors");
+
+// src/utils/internal/requestHandlerUtils.ts
+init_cjs_shims();
+init_polyfills_node();
+function use(currentHandlers, ...handlers) {
+  currentHandlers.unshift(...handlers);
+}
+function restoreHandlers(handlers) {
+  handlers.forEach((handler) => {
+    handler.markAsSkipped(false);
+  });
+}
+function resetHandlers(initialHandlers, ...nextHandlers) {
+  return nextHandlers.length > 0 ? [...nextHandlers] : [...initialHandlers];
+}
+
+// src/utils/request/parseIsomorphicRequest.ts
+init_cjs_shims();
+init_polyfills_node();
+
+// src/handlers/RequestHandler.ts
+init_cjs_shims();
+init_polyfills_node();
+var import_headers_polyfill4 = require("headers-polyfill");
+
+// src/response.ts
+init_cjs_shims();
+init_polyfills_node();
+var import_headers_polyfill = require("headers-polyfill");
+
+// src/utils/internal/compose.ts
+init_cjs_shims();
+init_polyfills_node();
+function compose(...fns) {
+  return (...args) => {
+    return fns.reduceRight((leftFn, rightFn) => {
+      return leftFn instanceof Promise ? Promise.resolve(leftFn).then(rightFn) : rightFn(leftFn);
+    }, args[0]);
+  };
+}
+
+// src/utils/NetworkError.ts
+init_cjs_shims();
+init_polyfills_node();
+var NetworkError = class extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "NetworkError";
+  }
+};
+
+// src/response.ts
+var defaultResponse = {
+  status: 200,
+  statusText: "OK",
+  body: null,
+  delay: 0,
+  once: false,
+  passthrough: false
+};
+var defaultResponseTransformers = [];
+function createResponseComposition(responseOverrides, defaultTransformers = defaultResponseTransformers) {
+  return async (...transformers) => {
+    const initialResponse = Object.assign({}, defaultResponse, {
+      headers: new import_headers_polyfill.Headers({
+        "x-powered-by": "msw"
+      })
+    }, responseOverrides);
+    const resolvedTransformers = [
+      ...defaultTransformers,
+      ...transformers
+    ].filter(Boolean);
+    const resolvedResponse = resolvedTransformers.length > 0 ? compose(...resolvedTransformers)(initialResponse) : initialResponse;
+    return resolvedResponse;
+  };
+}
+var response = Object.assign(createResponseComposition(), {
+  once: createResponseComposition({ once: true }),
+  networkError(message) {
+    throw new NetworkError(message);
+  }
+});
+
+// src/utils/internal/getCallFrame.ts
+init_cjs_shims();
+init_polyfills_node();
+var SOURCE_FRAME = /\/msw\/src\/(.+)/;
+var BUILD_FRAME = /(node_modules)?[\/\\]lib[\/\\](umd|esm|iief|cjs)[\/\\]|^[^\/\\]*$/;
+function getCallFrame(error2) {
+  const stack = error2.stack;
+  if (!stack) {
+    return;
+  }
+  const frames = stack.split("\n").slice(1);
+  const declarationFrame = frames.find((frame) => {
+    return !(SOURCE_FRAME.test(frame) || BUILD_FRAME.test(frame));
+  });
+  if (!declarationFrame) {
+    return;
+  }
+  const declarationPath = declarationFrame.replace(/\s*at [^()]*\(([^)]+)\)/, "$1").replace(/^@/, "");
+  return declarationPath;
+}
+
+// src/utils/internal/isIterable.ts
+init_cjs_shims();
+init_polyfills_node();
+function isIterable(fn) {
+  if (!fn) {
+    return false;
+  }
+  return typeof fn[Symbol.iterator] == "function";
+}
 
 // src/context/status.ts
-init_esm_shims();
-import statuses from "statuses/codes.json";
+init_cjs_shims();
+init_polyfills_node();
+var import_codes = __toESM(require("statuses/codes.json"));
 var status = (statusCode, statusText) => {
   return (res) => {
     res.status = statusCode;
-    res.statusText = statusText || statuses[String(statusCode)];
+    res.statusText = statusText || import_codes.default[String(statusCode)];
     return res;
   };
 };
 
 // src/context/set.ts
-init_esm_shims();
-import { objectToHeaders } from "headers-polyfill";
+init_cjs_shims();
+init_polyfills_node();
+var import_headers_polyfill2 = require("headers-polyfill");
 function set(...args) {
   return (res) => {
     const [name, value] = args;
     if (typeof name === "string") {
       res.headers.append(name, value);
     } else {
-      const headers = objectToHeaders(name);
+      const headers = (0, import_headers_polyfill2.objectToHeaders)(name);
       headers.forEach((value2, name2) => {
         res.headers.append(name2, value2);
       });
@@ -289,106 +412,16 @@ function set(...args) {
   };
 }
 
-// src/context/cookie.ts
-init_esm_shims();
-import * as cookieUtils from "cookie";
-var cookie = (name, value, options) => {
-  return (res) => {
-    const serializedCookie = cookieUtils.serialize(name, value, options);
-    res.headers.set("Set-Cookie", serializedCookie);
-    if (typeof document !== "undefined") {
-      document.cookie = serializedCookie;
-    }
-    return res;
-  };
-};
-
-// src/context/body.ts
-init_esm_shims();
-var body = (value) => {
-  return (res) => {
-    res.body = value;
-    return res;
-  };
-};
-
-// src/context/data.ts
-init_esm_shims();
-
-// src/utils/internal/jsonParse.ts
-init_esm_shims();
-function jsonParse(value) {
-  try {
-    return JSON.parse(value);
-  } catch (error2) {
-    return void 0;
-  }
-}
-
-// src/utils/internal/mergeRight.ts
-init_esm_shims();
-
-// src/utils/internal/isObject.ts
-init_esm_shims();
-function isObject(value) {
-  return value != null && typeof value === "object" && !Array.isArray(value);
-}
-
-// src/utils/internal/mergeRight.ts
-function mergeRight(left, right) {
-  return Object.entries(right).reduce((result, [key, rightValue]) => {
-    const leftValue = result[key];
-    if (Array.isArray(leftValue) && Array.isArray(rightValue)) {
-      result[key] = leftValue.concat(rightValue);
-      return result;
-    }
-    if (isObject(leftValue) && isObject(rightValue)) {
-      result[key] = mergeRight(leftValue, rightValue);
-      return result;
-    }
-    result[key] = rightValue;
-    return result;
-  }, Object.assign({}, left));
-}
-
-// src/context/json.ts
-init_esm_shims();
-var json = (body2) => {
-  return (res) => {
-    res.headers.set("Content-Type", "application/json");
-    res.body = JSON.stringify(body2);
-    return res;
-  };
-};
-
-// src/context/data.ts
-var data = (payload) => {
-  return (res) => {
-    const prevBody = jsonParse(res.body) || {};
-    const nextBody = mergeRight(prevBody, { data: payload });
-    return json(nextBody)(res);
-  };
-};
-
-// src/context/extensions.ts
-init_esm_shims();
-var extensions = (payload) => {
-  return (res) => {
-    const prevBody = jsonParse(res.body) || {};
-    const nextBody = mergeRight(prevBody, { extensions: payload });
-    return json(nextBody)(res);
-  };
-};
-
 // src/context/delay.ts
-init_esm_shims();
-import { isNodeProcess } from "is-node-process";
+init_cjs_shims();
+init_polyfills_node();
+var import_is_node_process = require("is-node-process");
 var SET_TIMEOUT_MAX_ALLOWED_INT = 2147483647;
 var MIN_SERVER_RESPONSE_TIME = 100;
 var MAX_SERVER_RESPONSE_TIME = 400;
 var NODE_SERVER_RESPONSE_TIME = 5;
 var getRandomServerResponseTime = () => {
-  if (isNodeProcess()) {
+  if ((0, import_is_node_process.isNodeProcess)()) {
     return NODE_SERVER_RESPONSE_TIME;
   }
   return Math.floor(Math.random() * (MAX_SERVER_RESPONSE_TIME - MIN_SERVER_RESPONSE_TIME) + MIN_SERVER_RESPONSE_TIME);
@@ -423,26 +456,14 @@ var delay = (durationOrMode) => {
   };
 };
 
-// src/context/errors.ts
-init_esm_shims();
-var errors = (errorsList) => {
-  return (res) => {
-    if (errorsList == null) {
-      return res;
-    }
-    const prevBody = jsonParse(res.body) || {};
-    const nextBody = mergeRight(prevBody, { errors: errorsList });
-    return json(nextBody)(res);
-  };
-};
-
 // src/context/fetch.ts
-init_esm_shims();
-import { isNodeProcess as isNodeProcess2 } from "is-node-process";
-import { Headers } from "headers-polyfill";
-var useFetch = isNodeProcess2() ? __require("node-fetch") : window.fetch;
+init_cjs_shims();
+init_polyfills_node();
+var import_is_node_process2 = require("is-node-process");
+var import_headers_polyfill3 = require("headers-polyfill");
+var useFetch = (0, import_is_node_process2.isNodeProcess)() ? require("node-fetch") : window.fetch;
 var augmentRequestInit = (requestInit) => {
-  const headers = new Headers(requestInit.headers);
+  const headers = new import_headers_polyfill3.Headers(requestInit.headers);
   headers.set("x-msw-bypass", "true");
   return __spreadProps(__spreadValues({}, requestInit), {
     headers: headers.all()
@@ -471,265 +492,6 @@ var fetch = (input, requestInit = {}) => {
   const derivedRequestInit = augmentRequestInit(requestParameters);
   return useFetch(input.url.href, derivedRequestInit);
 };
-
-// src/context/text.ts
-init_esm_shims();
-var text = (body2) => {
-  return (res) => {
-    res.headers.set("Content-Type", "text/plain");
-    res.body = body2;
-    return res;
-  };
-};
-
-// src/context/xml.ts
-init_esm_shims();
-var xml = (body2) => {
-  return (res) => {
-    res.headers.set("Content-Type", "text/xml");
-    res.body = body2;
-    return res;
-  };
-};
-
-// src/setupWorker/setupWorker.ts
-init_esm_shims();
-import { isNodeProcess as isNodeProcess3 } from "is-node-process";
-import { StrictEventEmitter } from "strict-event-emitter";
-
-// src/setupWorker/start/createStartHandler.ts
-init_esm_shims();
-import { until as until4 } from "@open-draft/until";
-
-// src/setupWorker/start/utils/getWorkerInstance.ts
-init_esm_shims();
-import { until } from "@open-draft/until";
-
-// src/setupWorker/start/utils/getWorkerByRegistration.ts
-init_esm_shims();
-var getWorkerByRegistration = (registration, absoluteWorkerUrl, findWorker) => {
-  const allStates = [
-    registration.active,
-    registration.installing,
-    registration.waiting
-  ];
-  const existingStates = allStates.filter(Boolean);
-  const mockWorker = existingStates.find((worker) => {
-    return findWorker(worker.scriptURL, absoluteWorkerUrl);
-  });
-  return mockWorker || null;
-};
-
-// src/utils/url/getAbsoluteWorkerUrl.ts
-init_esm_shims();
-function getAbsoluteWorkerUrl(relativeUrl) {
-  return new URL(relativeUrl, location.origin).href;
-}
-
-// src/utils/internal/devUtils.ts
-init_esm_shims();
-var import_outvariant = __toESM(require_lib());
-var LIBRARY_PREFIX = "[MSW]";
-function formatMessage(message, ...positionals) {
-  const interpolatedMessage = (0, import_outvariant.format)(message, ...positionals);
-  return `${LIBRARY_PREFIX} ${interpolatedMessage}`;
-}
-function warn(message, ...positionals) {
-  console.warn(formatMessage(message, ...positionals));
-}
-function error(message, ...positionals) {
-  console.error(formatMessage(message, ...positionals));
-}
-var devUtils = {
-  formatMessage,
-  warn,
-  error
-};
-
-// src/setupWorker/start/utils/getWorkerInstance.ts
-var getWorkerInstance = async (url, options = {}, findWorker) => {
-  const absoluteWorkerUrl = getAbsoluteWorkerUrl(url);
-  const mockRegistrations = await navigator.serviceWorker.getRegistrations().then((registrations) => registrations.filter((registration) => getWorkerByRegistration(registration, absoluteWorkerUrl, findWorker)));
-  if (!navigator.serviceWorker.controller && mockRegistrations.length > 0) {
-    location.reload();
-  }
-  const [existingRegistration] = mockRegistrations;
-  if (existingRegistration) {
-    return existingRegistration.update().then(() => {
-      return [
-        getWorkerByRegistration(existingRegistration, absoluteWorkerUrl, findWorker),
-        existingRegistration
-      ];
-    });
-  }
-  const [error2, instance] = await until(async () => {
-    const registration = await navigator.serviceWorker.register(url, options);
-    return [
-      getWorkerByRegistration(registration, absoluteWorkerUrl, findWorker),
-      registration
-    ];
-  });
-  if (error2) {
-    const isWorkerMissing = error2.message.includes("(404)");
-    if (isWorkerMissing) {
-      const scopeUrl = new URL((options == null ? void 0 : options.scope) || "/", location.href);
-      throw new Error(devUtils.formatMessage(`Failed to register a Service Worker for scope ('${scopeUrl.href}') with script ('${absoluteWorkerUrl}'): Service Worker script does not exist at the given path.
-
-Did you forget to run "npx msw init <PUBLIC_DIR>"?
-
-Learn more about creating the Service Worker script: https://mswjs.io/docs/cli/init`));
-    }
-    throw new Error(devUtils.formatMessage("Failed to register the Service Worker:\n\n%s", error2.message));
-  }
-  return instance;
-};
-
-// src/setupWorker/start/utils/enableMocking.ts
-init_esm_shims();
-
-// src/setupWorker/start/utils/printStartMessage.ts
-init_esm_shims();
-function printStartMessage(args = {}) {
-  if (args.quiet) {
-    return;
-  }
-  const message = args.message || "Mocking enabled.";
-  console.groupCollapsed(`%c${devUtils.formatMessage(message)}`, "color:orangered;font-weight:bold;");
-  console.log("%cDocumentation: %chttps://mswjs.io/docs", "font-weight:bold", "font-weight:normal");
-  console.log("Found an issue? https://github.com/mswjs/msw/issues");
-  if (args.workerUrl) {
-    console.log("Worker script URL:", args.workerUrl);
-  }
-  if (args.workerScope) {
-    console.log("Worker scope:", args.workerScope);
-  }
-  console.groupEnd();
-}
-
-// src/setupWorker/start/utils/enableMocking.ts
-async function enableMocking(context, options) {
-  var _a, _b;
-  context.workerChannel.send("MOCK_ACTIVATE");
-  await context.events.once("MOCKING_ENABLED");
-  if (context.isMockingEnabled) {
-    devUtils.warn(`Found a redundant "worker.start()" call. Note that starting the worker while mocking is already enabled will have no effect. Consider removing this "worker.start()" call.`);
-    return;
-  }
-  context.isMockingEnabled = true;
-  printStartMessage({
-    quiet: options.quiet,
-    workerScope: (_a = context.registration) == null ? void 0 : _a.scope,
-    workerUrl: (_b = context.worker) == null ? void 0 : _b.scriptURL
-  });
-}
-
-// src/utils/worker/createRequestListener.ts
-init_esm_shims();
-
-// src/utils/createBroadcastChannel.ts
-init_esm_shims();
-var createBroadcastChannel = (event) => {
-  const port = event.ports[0];
-  return {
-    send(message) {
-      if (port) {
-        port.postMessage(message);
-      }
-    }
-  };
-};
-
-// src/utils/NetworkError.ts
-init_esm_shims();
-var NetworkError = class extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "NetworkError";
-  }
-};
-
-// src/utils/request/parseWorkerRequest.ts
-init_esm_shims();
-import { Headers as Headers4 } from "headers-polyfill";
-
-// src/handlers/RequestHandler.ts
-init_esm_shims();
-import { Headers as Headers3 } from "headers-polyfill";
-
-// src/response.ts
-init_esm_shims();
-import { Headers as Headers2 } from "headers-polyfill";
-
-// src/utils/internal/compose.ts
-init_esm_shims();
-function compose(...fns) {
-  return (...args) => {
-    return fns.reduceRight((leftFn, rightFn) => {
-      return leftFn instanceof Promise ? Promise.resolve(leftFn).then(rightFn) : rightFn(leftFn);
-    }, args[0]);
-  };
-}
-
-// src/response.ts
-var defaultResponse = {
-  status: 200,
-  statusText: "OK",
-  body: null,
-  delay: 0,
-  once: false,
-  passthrough: false
-};
-var defaultResponseTransformers = [];
-function createResponseComposition(responseOverrides, defaultTransformers = defaultResponseTransformers) {
-  return async (...transformers) => {
-    const initialResponse = Object.assign({}, defaultResponse, {
-      headers: new Headers2({
-        "x-powered-by": "msw"
-      })
-    }, responseOverrides);
-    const resolvedTransformers = [
-      ...defaultTransformers,
-      ...transformers
-    ].filter(Boolean);
-    const resolvedResponse = resolvedTransformers.length > 0 ? compose(...resolvedTransformers)(initialResponse) : initialResponse;
-    return resolvedResponse;
-  };
-}
-var response = Object.assign(createResponseComposition(), {
-  once: createResponseComposition({ once: true }),
-  networkError(message) {
-    throw new NetworkError(message);
-  }
-});
-
-// src/utils/internal/getCallFrame.ts
-init_esm_shims();
-var SOURCE_FRAME = /\/msw\/src\/(.+)/;
-var BUILD_FRAME = /(node_modules)?[\/\\]lib[\/\\](umd|esm|iief|cjs)[\/\\]|^[^\/\\]*$/;
-function getCallFrame(error2) {
-  const stack = error2.stack;
-  if (!stack) {
-    return;
-  }
-  const frames = stack.split("\n").slice(1);
-  const declarationFrame = frames.find((frame) => {
-    return !(SOURCE_FRAME.test(frame) || BUILD_FRAME.test(frame));
-  });
-  if (!declarationFrame) {
-    return;
-  }
-  const declarationPath = declarationFrame.replace(/\s*at [^()]*\(([^)]+)\)/, "$1").replace(/^@/, "");
-  return declarationPath;
-}
-
-// src/utils/internal/isIterable.ts
-init_esm_shims();
-function isIterable(fn) {
-  if (!fn) {
-    return false;
-  }
-  return typeof fn[Symbol.iterator] == "function";
-}
 
 // src/handlers/RequestHandler.ts
 var defaultContext = {
@@ -805,75 +567,43 @@ function passthrough() {
   return {
     status: 101,
     statusText: "Continue",
-    headers: new Headers3(),
+    headers: new import_headers_polyfill4.Headers(),
     body: null,
     passthrough: true,
     once: false
   };
 }
 
-// src/utils/request/setRequestCookies.ts
-init_esm_shims();
-import * as cookieUtils3 from "cookie";
-import { store } from "@mswjs/cookies";
-
-// src/utils/request/getRequestCookies.ts
-init_esm_shims();
-import * as cookieUtils2 from "cookie";
-function getAllCookies() {
-  return cookieUtils2.parse(document.cookie);
-}
-function getRequestCookies(request) {
-  if (typeof document === "undefined" || typeof location === "undefined") {
-    return {};
-  }
-  switch (request.credentials) {
-    case "same-origin": {
-      return location.origin === request.url.origin ? getAllCookies() : {};
-    }
-    case "include": {
-      return getAllCookies();
-    }
-    default: {
-      return {};
-    }
-  }
-}
-
-// src/utils/request/setRequestCookies.ts
-function setRequestCookies(request) {
-  var _a;
-  const requestCookiesString = request.headers.get("cookie");
-  store.hydrate();
-  const cookiesFromStore = Array.from((_a = store.get(__spreadProps(__spreadValues({}, request), { url: request.url.toString() }))) == null ? void 0 : _a.entries()).reduce((cookies, [name, { value }]) => {
-    return Object.assign(cookies, { [name.trim()]: value });
-  }, {});
-  const cookiesFromDocument = getRequestCookies(request);
-  const forwardedCookies = __spreadValues(__spreadValues({}, cookiesFromDocument), cookiesFromStore);
-  for (const [name, value] of Object.entries(forwardedCookies)) {
-    request.headers.append("cookie", `${name}=${value}`);
-  }
-  const ownCookies = requestCookiesString ? cookieUtils3.parse(requestCookiesString) : {};
-  request.cookies = __spreadValues(__spreadValues(__spreadValues({}, request.cookies), forwardedCookies), ownCookies);
-}
-
 // src/utils/request/parseBody.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
+
+// src/utils/internal/jsonParse.ts
+init_cjs_shims();
+init_polyfills_node();
+function jsonParse(value) {
+  try {
+    return JSON.parse(value);
+  } catch (error2) {
+    return void 0;
+  }
+}
 
 // src/utils/internal/parseMultipartData.ts
-init_esm_shims();
-import { stringToHeaders } from "headers-polyfill";
+init_cjs_shims();
+init_polyfills_node();
+var import_headers_polyfill5 = require("headers-polyfill");
 function parseContentHeaders(headersString) {
   var _a, _b;
-  const headers = stringToHeaders(headersString);
+  const headers = (0, import_headers_polyfill5.stringToHeaders)(headersString);
   const contentType = headers.get("content-type") || "text/plain";
   const disposition = headers.get("content-disposition");
   if (!disposition) {
     throw new Error('"Content-Disposition" header is required.');
   }
   const directives = disposition.split(";").reduce((acc, chunk) => {
-    const [name2, ...rest2] = chunk.trim().split("=");
-    acc[name2] = rest2.join("=");
+    const [name2, ...rest] = chunk.trim().split("=");
+    acc[name2] = rest.join("=");
     return acc;
   }, {});
   const name = (_a = directives.name) == null ? void 0 : _a.slice(1, -1);
@@ -902,8 +632,8 @@ function parseMultipartData(data2, headers) {
   const parsedBody = {};
   try {
     for (const field of fields) {
-      const [contentHeaders, ...rest2] = field.split("\r\n\r\n");
-      const contentBody = rest2.join("\r\n\r\n");
+      const [contentHeaders, ...rest] = field.split("\r\n\r\n");
+      const contentBody = rest.join("\r\n\r\n");
       const { contentType: contentType2, filename, name } = parseContentHeaders(contentHeaders);
       const value = filename === void 0 ? contentBody : new File([contentBody], filename, { type: contentType2 });
       const parsedValue = parsedBody[name];
@@ -939,56 +669,86 @@ function parseBody(body2, headers) {
   return body2;
 }
 
-// src/utils/request/pruneGetRequestBody.ts
-init_esm_shims();
+// src/utils/request/setRequestCookies.ts
+init_cjs_shims();
+init_polyfills_node();
+var cookieUtils2 = __toESM(require("cookie"));
+var import_cookies = require("@mswjs/cookies");
 
-// src/utils/internal/isStringEqual.ts
-init_esm_shims();
-function isStringEqual(actual, expected) {
-  return actual.toLowerCase() === expected.toLowerCase();
+// src/utils/request/getRequestCookies.ts
+init_cjs_shims();
+init_polyfills_node();
+var cookieUtils = __toESM(require("cookie"));
+function getAllCookies() {
+  return cookieUtils.parse(document.cookie);
 }
-
-// src/utils/request/pruneGetRequestBody.ts
-function pruneGetRequestBody(request) {
-  if (request.method && isStringEqual(request.method, "GET") && request.body === "") {
-    return void 0;
+function getRequestCookies(request) {
+  if (typeof document === "undefined" || typeof location === "undefined") {
+    return {};
   }
-  return request.body;
+  switch (request.credentials) {
+    case "same-origin": {
+      return location.origin === request.url.origin ? getAllCookies() : {};
+    }
+    case "include": {
+      return getAllCookies();
+    }
+    default: {
+      return {};
+    }
+  }
 }
 
-// src/utils/request/parseWorkerRequest.ts
-function parseWorkerRequest(rawRequest) {
-  const request = {
-    id: rawRequest.id,
-    cache: rawRequest.cache,
-    credentials: rawRequest.credentials,
-    method: rawRequest.method,
-    url: new URL(rawRequest.url),
-    referrer: rawRequest.referrer,
-    referrerPolicy: rawRequest.referrerPolicy,
-    redirect: rawRequest.redirect,
-    mode: rawRequest.mode,
-    params: {},
+// src/utils/request/setRequestCookies.ts
+function setRequestCookies(request) {
+  var _a;
+  const requestCookiesString = request.headers.get("cookie");
+  import_cookies.store.hydrate();
+  const cookiesFromStore = Array.from((_a = import_cookies.store.get(__spreadProps(__spreadValues({}, request), { url: request.url.toString() }))) == null ? void 0 : _a.entries()).reduce((cookies, [name, { value }]) => {
+    return Object.assign(cookies, { [name.trim()]: value });
+  }, {});
+  const cookiesFromDocument = getRequestCookies(request);
+  const forwardedCookies = __spreadValues(__spreadValues({}, cookiesFromDocument), cookiesFromStore);
+  for (const [name, value] of Object.entries(forwardedCookies)) {
+    request.headers.append("cookie", `${name}=${value}`);
+  }
+  const ownCookies = requestCookiesString ? cookieUtils2.parse(requestCookiesString) : {};
+  request.cookies = __spreadValues(__spreadValues(__spreadValues({}, request.cookies), forwardedCookies), ownCookies);
+}
+
+// src/utils/request/parseIsomorphicRequest.ts
+function parseIsomorphicRequest(request) {
+  const mockedRequest = {
+    id: request.id,
+    url: request.url,
+    method: request.method,
+    body: parseBody(request.body, request.headers),
+    credentials: request.credentials || "same-origin",
+    headers: request.headers,
     cookies: {},
-    integrity: rawRequest.integrity,
-    keepalive: rawRequest.keepalive,
-    destination: rawRequest.destination,
-    body: pruneGetRequestBody(rawRequest),
-    bodyUsed: rawRequest.bodyUsed,
-    headers: new Headers4(rawRequest.headers),
+    redirect: "manual",
+    referrer: "",
+    keepalive: false,
+    cache: "default",
+    mode: "cors",
+    referrerPolicy: "no-referrer",
+    integrity: "",
+    destination: "document",
+    bodyUsed: false,
     passthrough
   };
-  setRequestCookies(request);
-  request.body = parseBody(request.body, request.headers);
-  return request;
+  setRequestCookies(mockedRequest);
+  return mockedRequest;
 }
 
 // src/utils/handleRequest.ts
-init_esm_shims();
-import { until as until2 } from "@open-draft/until";
+init_cjs_shims();
+init_polyfills_node();
+var import_until = require("@open-draft/until");
 
 // src/utils/getResponse.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 var getResponse = async (request, handlers, resolutionContext) => {
   const relevantHandlers = handlers.filter((handler) => {
     return handler.test(request, resolutionContext);
@@ -1035,18 +795,40 @@ var getResponse = async (request, handlers, resolutionContext) => {
   };
 };
 
+// src/utils/internal/devUtils.ts
+init_cjs_shims();
+init_polyfills_node();
+var import_outvariant = __toESM(require_lib());
+var LIBRARY_PREFIX = "[MSW]";
+function formatMessage(message, ...positionals) {
+  const interpolatedMessage = (0, import_outvariant.format)(message, ...positionals);
+  return `${LIBRARY_PREFIX} ${interpolatedMessage}`;
+}
+function warn(message, ...positionals) {
+  console.warn(formatMessage(message, ...positionals));
+}
+function error(message, ...positionals) {
+  console.error(formatMessage(message, ...positionals));
+}
+var devUtils = {
+  formatMessage,
+  warn,
+  error
+};
+
 // src/utils/request/onUnhandledRequest.ts
-init_esm_shims();
-import getStringMatchScore from "js-levenshtein";
+init_cjs_shims();
+init_polyfills_node();
+var import_js_levenshtein = __toESM(require("js-levenshtein"));
 
 // src/utils/internal/parseGraphQLRequest.ts
-init_esm_shims();
-import {
-  parse as parse3
-} from "graphql";
+init_cjs_shims();
+init_polyfills_node();
+var import_graphql = require("graphql");
 
 // src/utils/request/getPublicUrlFromRequest.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 var getPublicUrlFromRequest = (request) => {
   return request.referrer.startsWith(request.url.origin) ? request.url.pathname : new URL(request.url.pathname, `${request.url.protocol}//${request.url.host}`).href;
 };
@@ -1064,7 +846,7 @@ function parseDocumentNode(node) {
 }
 function parseQuery(query) {
   try {
-    const ast = parse3(query);
+    const ast = (0, import_graphql.parse)(query);
     return parseDocumentNode(ast);
   } catch (error2) {
     return error2;
@@ -1146,11 +928,148 @@ function parseGraphQLRequest(request) {
   };
 }
 
+// src/utils/internal/isStringEqual.ts
+init_cjs_shims();
+init_polyfills_node();
+function isStringEqual(actual, expected) {
+  return actual.toLowerCase() === expected.toLowerCase();
+}
+
 // src/handlers/RestHandler.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
+
+// src/context/index.ts
+init_cjs_shims();
+init_polyfills_node();
+
+// src/context/cookie.ts
+init_cjs_shims();
+init_polyfills_node();
+var cookieUtils3 = __toESM(require("cookie"));
+var cookie = (name, value, options) => {
+  return (res) => {
+    const serializedCookie = cookieUtils3.serialize(name, value, options);
+    res.headers.set("Set-Cookie", serializedCookie);
+    if (typeof document !== "undefined") {
+      document.cookie = serializedCookie;
+    }
+    return res;
+  };
+};
+
+// src/context/body.ts
+init_cjs_shims();
+init_polyfills_node();
+var body = (value) => {
+  return (res) => {
+    res.body = value;
+    return res;
+  };
+};
+
+// src/context/data.ts
+init_cjs_shims();
+init_polyfills_node();
+
+// src/utils/internal/mergeRight.ts
+init_cjs_shims();
+init_polyfills_node();
+
+// src/utils/internal/isObject.ts
+init_cjs_shims();
+init_polyfills_node();
+function isObject(value) {
+  return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+// src/utils/internal/mergeRight.ts
+function mergeRight(left, right) {
+  return Object.entries(right).reduce((result, [key, rightValue]) => {
+    const leftValue = result[key];
+    if (Array.isArray(leftValue) && Array.isArray(rightValue)) {
+      result[key] = leftValue.concat(rightValue);
+      return result;
+    }
+    if (isObject(leftValue) && isObject(rightValue)) {
+      result[key] = mergeRight(leftValue, rightValue);
+      return result;
+    }
+    result[key] = rightValue;
+    return result;
+  }, Object.assign({}, left));
+}
+
+// src/context/json.ts
+init_cjs_shims();
+init_polyfills_node();
+var json = (body2) => {
+  return (res) => {
+    res.headers.set("Content-Type", "application/json");
+    res.body = JSON.stringify(body2);
+    return res;
+  };
+};
+
+// src/context/data.ts
+var data = (payload) => {
+  return (res) => {
+    const prevBody = jsonParse(res.body) || {};
+    const nextBody = mergeRight(prevBody, { data: payload });
+    return json(nextBody)(res);
+  };
+};
+
+// src/context/extensions.ts
+init_cjs_shims();
+init_polyfills_node();
+var extensions = (payload) => {
+  return (res) => {
+    const prevBody = jsonParse(res.body) || {};
+    const nextBody = mergeRight(prevBody, { extensions: payload });
+    return json(nextBody)(res);
+  };
+};
+
+// src/context/errors.ts
+init_cjs_shims();
+init_polyfills_node();
+var errors = (errorsList) => {
+  return (res) => {
+    if (errorsList == null) {
+      return res;
+    }
+    const prevBody = jsonParse(res.body) || {};
+    const nextBody = mergeRight(prevBody, { errors: errorsList });
+    return json(nextBody)(res);
+  };
+};
+
+// src/context/text.ts
+init_cjs_shims();
+init_polyfills_node();
+var text = (body2) => {
+  return (res) => {
+    res.headers.set("Content-Type", "text/plain");
+    res.body = body2;
+    return res;
+  };
+};
+
+// src/context/xml.ts
+init_cjs_shims();
+init_polyfills_node();
+var xml = (body2) => {
+  return (res) => {
+    res.headers.set("Content-Type", "text/xml");
+    res.body = body2;
+    return res;
+  };
+};
 
 // src/utils/logging/getStatusCodeColor.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 function getStatusCodeColor(status2) {
   if (status2 < 300) {
     return "#69AB32" /* Success */;
@@ -1162,14 +1081,16 @@ function getStatusCodeColor(status2) {
 }
 
 // src/utils/logging/getTimestamp.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 function getTimestamp() {
   const now = new Date();
   return [now.getHours(), now.getMinutes(), now.getSeconds()].map(String).map((chunk) => chunk.slice(0, 2)).map((chunk) => chunk.padStart(2, "0")).join(":");
 }
 
 // src/utils/logging/prepareRequest.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 function prepareRequest(request) {
   return __spreadProps(__spreadValues({}, request), {
     headers: request.headers.all()
@@ -1177,25 +1098,29 @@ function prepareRequest(request) {
 }
 
 // src/utils/logging/prepareResponse.ts
-init_esm_shims();
-import { objectToHeaders as objectToHeaders2 } from "headers-polyfill";
+init_cjs_shims();
+init_polyfills_node();
+var import_headers_polyfill6 = require("headers-polyfill");
 function prepareResponse(res) {
-  const responseHeaders = objectToHeaders2(res.headers);
+  const responseHeaders = (0, import_headers_polyfill6.objectToHeaders)(res.headers);
   return __spreadProps(__spreadValues({}, res), {
     body: parseBody(res.body, responseHeaders)
   });
 }
 
 // src/utils/matching/matchRequestUrl.ts
-init_esm_shims();
-import { match } from "path-to-regexp";
-import { getCleanUrl } from "@mswjs/interceptors/lib/utils/getCleanUrl";
+init_cjs_shims();
+init_polyfills_node();
+var import_path_to_regexp = require("path-to-regexp");
+var import_getCleanUrl = require("@mswjs/interceptors/lib/utils/getCleanUrl");
 
 // src/utils/matching/normalizePath.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 
 // src/utils/url/cleanUrl.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 var REDUNDANT_CHARACTERS_EXP = /[\?|#].*$/g;
 function getSearchParams(path) {
   return new URL(`/${path}`, "http://localhost").searchParams;
@@ -1205,10 +1130,12 @@ function cleanUrl(path) {
 }
 
 // src/utils/url/getAbsoluteUrl.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 
 // src/utils/url/isAbsoluteUrl.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 function isAbsoluteUrl(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 }
@@ -1247,8 +1174,8 @@ function coercePath(path) {
 function matchRequestUrl(url, path, baseUrl) {
   const normalizedPath = normalizePath(path, baseUrl);
   const cleanPath = typeof normalizedPath === "string" ? coercePath(normalizedPath) : normalizedPath;
-  const cleanUrl2 = getCleanUrl(url);
-  const result = match(cleanPath, { decode: decodeURIComponent })(cleanUrl2);
+  const cleanUrl2 = (0, import_getCleanUrl.getCleanUrl)(url);
+  const result = (0, import_path_to_regexp.match)(cleanPath, { decode: decodeURIComponent })(cleanUrl2);
   const params = result && result.params || {};
   return {
     matches: result !== false,
@@ -1257,16 +1184,6 @@ function matchRequestUrl(url, path, baseUrl) {
 }
 
 // src/handlers/RestHandler.ts
-var RESTMethods = /* @__PURE__ */ ((RESTMethods2) => {
-  RESTMethods2["HEAD"] = "HEAD";
-  RESTMethods2["GET"] = "GET";
-  RESTMethods2["POST"] = "POST";
-  RESTMethods2["PUT"] = "PUT";
-  RESTMethods2["PATCH"] = "PATCH";
-  RESTMethods2["OPTIONS"] = "OPTIONS";
-  RESTMethods2["DELETE"] = "DELETE";
-  return RESTMethods2;
-})(RESTMethods || {});
 var restContext = __spreadProps(__spreadValues({}, defaultContext), {
   cookie,
   body,
@@ -1332,10 +1249,12 @@ var RestHandler = class extends RequestHandler {
 };
 
 // src/handlers/GraphQLHandler.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 
 // src/utils/internal/tryCatch.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 function tryCatch(fn, onException) {
   try {
     const result = fn();
@@ -1447,7 +1366,7 @@ function getRestHandlerScore() {
     const hasSameMethod = isStringEqual(request.method, method);
     const methodScoreDelta = hasSameMethod ? TYPE_MATCH_DELTA : 0;
     const requestPublicUrl = getPublicUrlFromRequest(request);
-    const score = getStringMatchScore(requestPublicUrl, path);
+    const score = (0, import_js_levenshtein.default)(requestPublicUrl, path);
     return score - methodScoreDelta;
   };
 }
@@ -1462,7 +1381,7 @@ function getGraphQLHandlerScore(parsedQuery) {
     }
     const hasSameOperationType = parsedQuery.operationType === operationType;
     const operationTypeScoreDelta = hasSameOperationType ? TYPE_MATCH_DELTA : 0;
-    const score = getStringMatchScore(parsedQuery.operationName, operationName);
+    const score = (0, import_js_levenshtein.default)(parsedQuery.operationName, operationName);
     return score - operationTypeScoreDelta;
   };
 }
@@ -1530,11 +1449,12 @@ Read more: https://mswjs.io/docs/getting-started/mocks`
 }
 
 // src/utils/request/readResponseCookies.ts
-init_esm_shims();
-import { store as store2 } from "@mswjs/cookies";
+init_cjs_shims();
+init_polyfills_node();
+var import_cookies2 = require("@mswjs/cookies");
 function readResponseCookies(request, response2) {
-  store2.add(__spreadProps(__spreadValues({}, request), { url: request.url.toString() }), response2);
-  store2.persist();
+  import_cookies2.store.add(__spreadProps(__spreadValues({}, request), { url: request.url.toString() }), response2);
+  import_cookies2.store.persist();
 }
 
 // src/utils/handleRequest.ts
@@ -1546,7 +1466,7 @@ async function handleRequest(request, handlers, options, emitter, handleRequestO
     (_a = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _a.call(handleRequestOptions, request);
     return;
   }
-  const [lookupError, lookupResult] = await until2(() => {
+  const [lookupError, lookupResult] = await (0, import_until.until)(() => {
     return getResponse(request, handlers, handleRequestOptions == null ? void 0 : handleRequestOptions.resolutionContext);
   });
   if (lookupError) {
@@ -1591,340 +1511,9 @@ async function handleRequest(request, handlers, options, emitter, handleRequestO
   });
 }
 
-// src/utils/worker/createRequestListener.ts
-var createRequestListener = (context, options) => {
-  return async (event, message) => {
-    const channel = createBroadcastChannel(event);
-    try {
-      const request = parseWorkerRequest(message.payload);
-      await handleRequest(request, context.requestHandlers, options, context.emitter, {
-        transformResponse(response2) {
-          return __spreadProps(__spreadValues({}, response2), {
-            headers: response2.headers.all()
-          });
-        },
-        onPassthroughResponse() {
-          return channel.send({
-            type: "MOCK_NOT_FOUND"
-          });
-        },
-        onMockedResponse(response2) {
-          channel.send({
-            type: "MOCK_SUCCESS",
-            payload: response2
-          });
-        },
-        onMockedResponseSent(response2, { handler, publicRequest, parsedRequest }) {
-          if (!options.quiet) {
-            handler.log(publicRequest, response2, handler, parsedRequest);
-          }
-        }
-      });
-    } catch (error2) {
-      if (error2 instanceof NetworkError) {
-        return channel.send({
-          type: "NETWORK_ERROR",
-          payload: {
-            name: error2.name,
-            message: error2.message
-          }
-        });
-      }
-      if (error2 instanceof Error) {
-        channel.send({
-          type: "INTERNAL_ERROR",
-          payload: {
-            status: 500,
-            body: JSON.stringify({
-              errorType: error2.constructor.name,
-              message: error2.message,
-              location: error2.stack
-            })
-          }
-        });
-      }
-    }
-  };
-};
-
-// src/utils/internal/requestIntegrityCheck.ts
-init_esm_shims();
-async function requestIntegrityCheck(context, serviceWorker) {
-  context.workerChannel.send("INTEGRITY_CHECK_REQUEST");
-  const { payload: actualChecksum } = await context.events.once("INTEGRITY_CHECK_RESPONSE");
-  if (actualChecksum !== "02f4ad4a2797f85668baf196e553d929") {
-    throw new Error(`Currently active Service Worker (${actualChecksum}) is behind the latest published one (${"02f4ad4a2797f85668baf196e553d929"}).`);
-  }
-  return serviceWorker;
-}
-
-// src/utils/deferNetworkRequestsUntil.ts
-init_esm_shims();
-import { until as until3 } from "@open-draft/until";
-function deferNetworkRequestsUntil(predicatePromise) {
-  const originalXhrSend = window.XMLHttpRequest.prototype.send;
-  window.XMLHttpRequest.prototype.send = function(...args) {
-    until3(() => predicatePromise).then(() => {
-      window.XMLHttpRequest.prototype.send = originalXhrSend;
-      this.send(...args);
-    });
-  };
-  const originalFetch = window.fetch;
-  window.fetch = async (...args) => {
-    await until3(() => predicatePromise);
-    window.fetch = originalFetch;
-    return window.fetch(...args);
-  };
-}
-
-// src/utils/worker/createResponseListener.ts
-init_esm_shims();
-function createResponseListener(context) {
-  return (_, message) => {
-    var _a;
-    const { payload: responseJson } = message;
-    if ((_a = responseJson.type) == null ? void 0 : _a.includes("opaque")) {
-      return;
-    }
-    const response2 = new Response(responseJson.body || null, responseJson);
-    const isMockedResponse = response2.headers.get("x-powered-by") === "msw";
-    if (isMockedResponse) {
-      context.emitter.emit("response:mocked", response2, responseJson.requestId);
-    } else {
-      context.emitter.emit("response:bypass", response2, responseJson.requestId);
-    }
-  };
-}
-
-// src/setupWorker/start/utils/validateWorkerScope.ts
-init_esm_shims();
-function validateWorkerScope(registration, options) {
-  if (!(options == null ? void 0 : options.quiet) && !location.href.startsWith(registration.scope)) {
-    devUtils.warn(`Cannot intercept requests on this page because it's outside of the worker's scope ("${registration.scope}"). If you wish to mock API requests on this page, you must resolve this scope issue.
-
-- (Recommended) Register the worker at the root level ("/") of your application.
-- Set the "Service-Worker-Allowed" response header to allow out-of-scope workers.`);
-  }
-}
-
-// src/setupWorker/start/createStartHandler.ts
-var createStartHandler = (context) => {
-  return function start(options, customOptions) {
-    const startWorkerInstance = async () => {
-      context.events.removeAllListeners();
-      context.workerChannel.on("REQUEST", createRequestListener(context, options));
-      context.workerChannel.on("RESPONSE", createResponseListener(context));
-      const instance = await getWorkerInstance(options.serviceWorker.url, options.serviceWorker.options, options.findWorker);
-      const [worker, registration] = instance;
-      if (!worker) {
-        const missingWorkerMessage = (customOptions == null ? void 0 : customOptions.findWorker) ? devUtils.formatMessage(`Failed to locate the Service Worker registration using a custom "findWorker" predicate.
-
-Please ensure that the custom predicate properly locates the Service Worker registration at "%s".
-More details: https://mswjs.io/docs/api/setup-worker/start#findworker
-`, options.serviceWorker.url) : devUtils.formatMessage(`Failed to locate the Service Worker registration.
-
-This most likely means that the worker script URL "%s" cannot resolve against the actual public hostname (%s). This may happen if your application runs behind a proxy, or has a dynamic hostname.
-
-Please consider using a custom "serviceWorker.url" option to point to the actual worker script location, or a custom "findWorker" option to resolve the Service Worker registration manually. More details: https://mswjs.io/docs/api/setup-worker/start`, options.serviceWorker.url, location.host);
-        throw new Error(missingWorkerMessage);
-      }
-      context.worker = worker;
-      context.registration = registration;
-      context.events.addListener(window, "beforeunload", () => {
-        if (worker.state !== "redundant") {
-          context.workerChannel.send("CLIENT_CLOSED");
-        }
-        window.clearInterval(context.keepAliveInterval);
-      });
-      const [integrityError] = await until4(() => requestIntegrityCheck(context, worker));
-      if (integrityError) {
-        devUtils.error(`Detected outdated Service Worker: ${integrityError.message}
-
-The mocking is still enabled, but it's highly recommended that you update your Service Worker by running:
-
-$ npx msw init <PUBLIC_DIR>
-
-This is necessary to ensure that the Service Worker is in sync with the library to guarantee its stability.
-If this message still persists after updating, please report an issue: https://github.com/open-draft/msw/issues      `);
-      }
-      context.keepAliveInterval = window.setInterval(() => context.workerChannel.send("KEEPALIVE_REQUEST"), 5e3);
-      validateWorkerScope(registration, context.startOptions);
-      return registration;
-    };
-    const workerRegistration = startWorkerInstance().then(async (registration) => {
-      const pendingInstance = registration.installing || registration.waiting;
-      if (pendingInstance) {
-        await new Promise((resolve) => {
-          pendingInstance.addEventListener("statechange", () => {
-            if (pendingInstance.state === "activated") {
-              return resolve();
-            }
-          });
-        });
-      }
-      await enableMocking(context, options).catch((error2) => {
-        throw new Error(`Failed to enable mocking: ${error2 == null ? void 0 : error2.message}`);
-      });
-      return registration;
-    });
-    if (options.waitUntilReady) {
-      deferNetworkRequestsUntil(workerRegistration);
-    }
-    return workerRegistration;
-  };
-};
-
-// src/setupWorker/stop/createStop.ts
-init_esm_shims();
-
-// src/setupWorker/stop/utils/printStopMessage.ts
-init_esm_shims();
-function printStopMessage(args = {}) {
-  if (args.quiet) {
-    return;
-  }
-  console.log(`%c${devUtils.formatMessage("Mocking disabled.")}`, "color:orangered;font-weight:bold;");
-}
-
-// src/setupWorker/stop/createStop.ts
-var createStop = (context) => {
-  return function stop() {
-    var _a;
-    if (!context.isMockingEnabled) {
-      devUtils.warn('Found a redundant "worker.stop()" call. Note that stopping the worker while mocking already stopped has no effect. Consider removing this "worker.stop()" call.');
-      return;
-    }
-    context.workerChannel.send("MOCK_DEACTIVATE");
-    context.isMockingEnabled = false;
-    window.clearInterval(context.keepAliveInterval);
-    printStopMessage({ quiet: (_a = context.startOptions) == null ? void 0 : _a.quiet });
-  };
-};
-
-// src/utils/internal/requestHandlerUtils.ts
-init_esm_shims();
-function use(currentHandlers, ...handlers) {
-  currentHandlers.unshift(...handlers);
-}
-function restoreHandlers(handlers) {
-  handlers.forEach((handler) => {
-    handler.markAsSkipped(false);
-  });
-}
-function resetHandlers(initialHandlers, ...nextHandlers) {
-  return nextHandlers.length > 0 ? [...nextHandlers] : [...initialHandlers];
-}
-
-// src/setupWorker/start/utils/prepareStartHandler.ts
-init_esm_shims();
-var DEFAULT_START_OPTIONS = {
-  serviceWorker: {
-    url: "/mockServiceWorker.js",
-    options: null
-  },
-  quiet: false,
-  waitUntilReady: true,
-  onUnhandledRequest: "warn",
-  findWorker(scriptURL, mockServiceWorkerUrl) {
-    return scriptURL === mockServiceWorkerUrl;
-  }
-};
-function resolveStartOptions(initialOptions) {
-  return mergeRight(DEFAULT_START_OPTIONS, initialOptions || {});
-}
-function prepareStartHandler(handler, context) {
-  return (initialOptions) => {
-    context.startOptions = resolveStartOptions(initialOptions);
-    return handler(context.startOptions, initialOptions || {});
-  };
-}
-
-// src/setupWorker/start/createFallbackStart.ts
-init_esm_shims();
-
-// src/utils/worker/createFallbackRequestListener.ts
-init_esm_shims();
-import { createInterceptor } from "@mswjs/interceptors";
-import { interceptFetch } from "@mswjs/interceptors/lib/interceptors/fetch";
-import { interceptXMLHttpRequest } from "@mswjs/interceptors/lib/interceptors/XMLHttpRequest";
-
-// src/utils/request/parseIsomorphicRequest.ts
-init_esm_shims();
-function parseIsomorphicRequest(request) {
-  const mockedRequest = {
-    id: request.id,
-    url: request.url,
-    method: request.method,
-    body: parseBody(request.body, request.headers),
-    credentials: request.credentials || "same-origin",
-    headers: request.headers,
-    cookies: {},
-    redirect: "manual",
-    referrer: "",
-    keepalive: false,
-    cache: "default",
-    mode: "cors",
-    referrerPolicy: "no-referrer",
-    integrity: "",
-    destination: "document",
-    bodyUsed: false,
-    passthrough
-  };
-  setRequestCookies(mockedRequest);
-  return mockedRequest;
-}
-
-// src/utils/worker/createFallbackRequestListener.ts
-function createFallbackRequestListener(context, options) {
-  const interceptor = createInterceptor({
-    modules: [interceptFetch, interceptXMLHttpRequest],
-    async resolver(request) {
-      const mockedRequest = parseIsomorphicRequest(request);
-      return handleRequest(mockedRequest, context.requestHandlers, options, context.emitter, {
-        transformResponse(response2) {
-          return {
-            status: response2.status,
-            statusText: response2.statusText,
-            headers: response2.headers.all(),
-            body: response2.body
-          };
-        },
-        onMockedResponseSent(response2, { handler, publicRequest, parsedRequest }) {
-          if (!options.quiet) {
-            handler.log(publicRequest, response2, handler, parsedRequest);
-          }
-        }
-      });
-    }
-  });
-  interceptor.apply();
-  return interceptor;
-}
-
-// src/setupWorker/start/createFallbackStart.ts
-function createFallbackStart(context) {
-  return async function start(options) {
-    context.fallbackInterceptor = createFallbackRequestListener(context, options);
-    printStartMessage({
-      message: "Mocking enabled (fallback mode).",
-      quiet: options.quiet
-    });
-    return void 0;
-  };
-}
-
-// src/setupWorker/stop/createFallbackStop.ts
-init_esm_shims();
-function createFallbackStop(context) {
-  return function stop() {
-    var _a, _b;
-    (_a = context.fallbackInterceptor) == null ? void 0 : _a.restore();
-    printStopMessage({ quiet: (_b = context.startOptions) == null ? void 0 : _b.quiet });
-  };
-}
-
 // src/utils/internal/pipeEvents.ts
-init_esm_shims();
+init_cjs_shims();
+init_polyfills_node();
 function pipeEvents(source, destination) {
   const rawEmit = source.emit;
   if (rawEmit._isPiped) {
@@ -1937,194 +1526,97 @@ function pipeEvents(source, destination) {
   source.emit._isPiped = true;
 }
 
-// src/setupWorker/setupWorker.ts
-var listeners = [];
-function setupWorker(...requestHandlers) {
-  requestHandlers.forEach((handler) => {
-    if (Array.isArray(handler))
-      throw new Error(devUtils.formatMessage('Failed to call "setupWorker" given an Array of request handlers (setupWorker([a, b])), expected to receive each handler individually: setupWorker(a, b).'));
-  });
-  if (isNodeProcess3()) {
-    throw new Error(devUtils.formatMessage("Failed to execute `setupWorker` in a non-browser environment. Consider using `setupServer` for Node.js environment instead."));
-  }
-  const emitter = new StrictEventEmitter();
-  const publicEmitter = new StrictEventEmitter();
+// src/node/createSetupServer.ts
+var DEFAULT_LISTEN_OPTIONS = {
+  onUnhandledRequest: "warn"
+};
+function createSetupServer(...interceptors) {
+  const emitter = new import_strict_event_emitter.StrictEventEmitter();
+  const publicEmitter = new import_strict_event_emitter.StrictEventEmitter();
   pipeEvents(emitter, publicEmitter);
-  const context = {
-    isMockingEnabled: false,
-    startOptions: void 0,
-    worker: null,
-    registration: null,
-    requestHandlers: [...requestHandlers],
-    emitter,
-    workerChannel: {
-      on(eventType, callback) {
-        context.events.addListener(navigator.serviceWorker, "message", (event) => {
-          if (event.source !== context.worker) {
-            return;
-          }
-          const message = jsonParse(event.data);
-          if (!message) {
-            return;
-          }
-          if (message.type === eventType) {
-            callback(event, message);
-          }
-        });
-      },
-      send(type) {
-        var _a;
-        (_a = context.worker) == null ? void 0 : _a.postMessage(type);
-      }
-    },
-    events: {
-      addListener(target, eventType, callback) {
-        target.addEventListener(eventType, callback);
-        listeners.push({ eventType, target, callback });
-        return () => {
-          target.removeEventListener(eventType, callback);
-        };
-      },
-      removeAllListeners() {
-        for (const { target, eventType, callback } of listeners) {
-          target.removeEventListener(eventType, callback);
-        }
-        listeners = [];
-      },
-      once(eventType) {
-        const bindings = [];
-        return new Promise((resolve, reject) => {
-          const handleIncomingMessage = (event) => {
-            try {
-              const message = JSON.parse(event.data);
-              if (message.type === eventType) {
-                resolve(message);
-              }
-            } catch (error2) {
-              reject(error2);
-            }
-          };
-          bindings.push(context.events.addListener(navigator.serviceWorker, "message", handleIncomingMessage), context.events.addListener(navigator.serviceWorker, "messageerror", reject));
-        }).finally(() => {
-          bindings.forEach((unbind) => unbind());
-        });
-      }
-    },
-    useFallbackMode: !("serviceWorker" in navigator) || location.protocol === "file:"
-  };
-  const startHandler = context.useFallbackMode ? createFallbackStart(context) : createStartHandler(context);
-  const stopHandler = context.useFallbackMode ? createFallbackStop(context) : createStop(context);
-  return {
-    start: prepareStartHandler(startHandler, context),
-    stop() {
-      context.events.removeAllListeners();
-      context.emitter.removeAllListeners();
-      publicEmitter.removeAllListeners();
-      stopHandler();
-    },
-    use(...handlers) {
-      use(context.requestHandlers, ...handlers);
-    },
-    restoreHandlers() {
-      restoreHandlers(context.requestHandlers);
-    },
-    resetHandlers(...nextHandlers) {
-      context.requestHandlers = resetHandlers(requestHandlers, ...nextHandlers);
-    },
-    printHandlers() {
-      context.requestHandlers.forEach((handler) => {
-        const { header, callFrame } = handler.info;
-        const pragma = handler.info.hasOwnProperty("operationType") ? "[graphql]" : "[rest]";
-        console.groupCollapsed(`${pragma} ${header}`);
-        if (callFrame) {
-          console.log(`Declaration: ${callFrame}`);
-        }
-        console.log("Handler:", handler);
-        if (handler instanceof RestHandler) {
-          console.log("Match:", `https://mswjs.io/repl?path=${handler.info.path}`);
-        }
-        console.groupEnd();
-      });
-    },
-    events: {
-      on(...args) {
-        return publicEmitter.on(...args);
-      },
-      removeListener(...args) {
-        return publicEmitter.removeListener(...args);
-      },
-      removeAllListeners(...args) {
-        return publicEmitter.removeAllListeners(...args);
-      }
+  return function setupServer2(...requestHandlers) {
+    requestHandlers.forEach((handler) => {
+      if (Array.isArray(handler))
+        throw new Error(devUtils.formatMessage('Failed to call "setupServer" given an Array of request handlers (setupServer([a, b])), expected to receive each handler individually: setupServer(a, b).'));
+    });
+    let currentHandlers = [...requestHandlers];
+    if (!(0, import_is_node_process3.isNodeProcess)()) {
+      throw new Error(devUtils.formatMessage("Failed to execute `setupServer` in the environment that is not Node.js (i.e. a browser). Consider using `setupWorker` instead."));
     }
+    let resolvedOptions = {};
+    const interceptor = (0, import_interceptors.createInterceptor)({
+      modules: interceptors,
+      async resolver(request) {
+        const mockedRequest = parseIsomorphicRequest(request);
+        return handleRequest(mockedRequest, currentHandlers, resolvedOptions, emitter, {
+          transformResponse(response2) {
+            return {
+              status: response2.status,
+              statusText: response2.statusText,
+              headers: response2.headers.all(),
+              body: response2.body
+            };
+          }
+        });
+      }
+    });
+    interceptor.on("response", (request, response2) => {
+      if (!request.id) {
+        return;
+      }
+      if (response2.headers.get("x-powered-by") === "msw") {
+        emitter.emit("response:mocked", response2, request.id);
+      } else {
+        emitter.emit("response:bypass", response2, request.id);
+      }
+    });
+    return {
+      listen(options) {
+        resolvedOptions = mergeRight(DEFAULT_LISTEN_OPTIONS, options || {});
+        interceptor.apply();
+      },
+      use(...handlers) {
+        use(currentHandlers, ...handlers);
+      },
+      restoreHandlers() {
+        restoreHandlers(currentHandlers);
+      },
+      resetHandlers(...nextHandlers) {
+        currentHandlers = resetHandlers(requestHandlers, ...nextHandlers);
+      },
+      printHandlers() {
+        currentHandlers.forEach((handler) => {
+          const { header, callFrame } = handler.info;
+          const pragma = handler.info.hasOwnProperty("operationType") ? "[graphql]" : "[rest]";
+          console.log(`${(0, import_chalk.bold)(`${pragma} ${header}`)}
+  Declaration: ${callFrame}
+`);
+        });
+      },
+      events: {
+        on(...args) {
+          return publicEmitter.on(...args);
+        },
+        removeListener(...args) {
+          return publicEmitter.removeListener(...args);
+        },
+        removeAllListeners(...args) {
+          return publicEmitter.removeAllListeners(...args);
+        }
+      },
+      close() {
+        emitter.removeAllListeners();
+        publicEmitter.removeAllListeners();
+        interceptor.restore();
+      }
+    };
   };
 }
 
-// src/rest.ts
-init_esm_shims();
-function createRestHandler(method) {
-  return (path, resolver) => {
-    return new RestHandler(method, path, resolver);
-  };
-}
-var rest = {
-  all: createRestHandler(/.+/),
-  head: createRestHandler("HEAD" /* HEAD */),
-  get: createRestHandler("GET" /* GET */),
-  post: createRestHandler("POST" /* POST */),
-  put: createRestHandler("PUT" /* PUT */),
-  delete: createRestHandler("DELETE" /* DELETE */),
-  patch: createRestHandler("PATCH" /* PATCH */),
-  options: createRestHandler("OPTIONS" /* OPTIONS */)
-};
-
-// src/graphql.ts
-init_esm_shims();
-import { OperationTypeNode as OperationTypeNode2 } from "graphql";
-function createScopedGraphQLHandler(operationType, url) {
-  return (operationName, resolver) => {
-    return new GraphQLHandler(operationType, operationName, url, resolver);
-  };
-}
-function createGraphQLOperationHandler(url) {
-  return (resolver) => {
-    return new GraphQLHandler("all", new RegExp(".*"), url, resolver);
-  };
-}
-var standardGraphQLHandlers = {
-  operation: createGraphQLOperationHandler("*"),
-  query: createScopedGraphQLHandler(OperationTypeNode2.QUERY, "*"),
-  mutation: createScopedGraphQLHandler(OperationTypeNode2.MUTATION, "*")
-};
-function createGraphQLLink(url) {
-  return {
-    operation: createGraphQLOperationHandler(url),
-    query: createScopedGraphQLHandler(OperationTypeNode2.QUERY, url),
-    mutation: createScopedGraphQLHandler(OperationTypeNode2.MUTATION, url)
-  };
-}
-var graphql = __spreadProps(__spreadValues({}, standardGraphQLHandlers), {
-  link: createGraphQLLink
+// src/node/setupServer.ts
+var setupServer = createSetupServer(import_ClientRequest.interceptClientRequest, import_XMLHttpRequest.interceptXMLHttpRequest);
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  setupServer
 });
-export {
-  GraphQLHandler,
-  RESTMethods,
-  RequestHandler,
-  RestHandler,
-  cleanUrl,
-  compose,
-  context_exports as context,
-  createResponseComposition,
-  defaultContext,
-  defaultResponse,
-  graphql,
-  graphqlContext,
-  handleRequest,
-  matchRequestUrl,
-  parseIsomorphicRequest,
-  response,
-  rest,
-  restContext,
-  setupWorker
-};
 //# sourceMappingURL=index.js.map

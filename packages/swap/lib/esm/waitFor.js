@@ -1,1 +1,8 @@
-var e="function"==typeof setImmediate?setImmediate:setTimeout,t=function(){return new Promise((function(t){e(t)}))};export{t as waitFor};
+const scheduler = typeof setImmediate === 'function' ? setImmediate : setTimeout;
+const waitFor = function () {
+    return new Promise((resolve) => {
+        scheduler(resolve);
+    });
+};
+
+export { waitFor };

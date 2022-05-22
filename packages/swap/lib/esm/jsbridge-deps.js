@@ -1,1 +1,135 @@
-import{call as t,callWithPromise as n}from"swap-jsbridge";import e from"axios";var r={mode:"MOCK",isMock:!1,bypassMode:"none",mockData:{},unmatchedMock:{code:999,msg:"没有匹配到数据"},swapJestServer:{},workerOpt:null,isOnline:!1,baseURL:""},o=function(t){return t?r[t]:r},a=function(t,n){return r[t]=n,r},i=function(t){return Object.entries(t).forEach((function(t){var n=t[0],e=t[1];a(n,e)})),r},c=function(){return c=Object.assign||function(t){for(var n,e=1,r=arguments.length;e<r;e++)for(var o in n=arguments[e])Object.prototype.hasOwnProperty.call(n,o)&&(t[o]=n[o]);return t},c.apply(this,arguments)};function u(t,n,e,r){return new(e||(e=Promise))((function(o,a){function i(t){try{u(r.next(t))}catch(t){a(t)}}function c(t){try{u(r.throw(t))}catch(t){a(t)}}function u(t){var n;t.done?o(t.value):(n=t.value,n instanceof e?n:new e((function(t){t(n)}))).then(i,c)}u((r=r.apply(t,n||[])).next())}))}function s(t,n){var e,r,o,a,i={label:0,sent:function(){if(1&o[0])throw o[1];return o[1]},trys:[],ops:[]};return a={next:c(0),throw:c(1),return:c(2)},"function"==typeof Symbol&&(a[Symbol.iterator]=function(){return this}),a;function c(a){return function(c){return function(a){if(e)throw new TypeError("Generator is already executing.");for(;i;)try{if(e=1,r&&(o=2&a[0]?r.return:a[0]?r.throw||((o=r.return)&&o.call(r),0):r.next)&&!(o=o.call(r,a[1])).done)return o;switch(r=0,o&&(a=[2&a[0],o.value]),a[0]){case 0:case 1:o=a;break;case 4:return i.label++,{value:a[1],done:!1};case 5:i.label++,r=a[1],a=[0];continue;case 7:a=i.ops.pop(),i.trys.pop();continue;default:if(!(o=i.trys,(o=o.length>0&&o[o.length-1])||6!==a[0]&&2!==a[0])){i=0;continue}if(3===a[0]&&(!o||a[1]>o[0]&&a[1]<o[3])){i.label=a[1];break}if(6===a[0]&&i.label<o[1]){i.label=o[1],o=a;break}if(o&&i.label<o[2]){i.label=o[2],i.ops.push(a);break}o[2]&&i.ops.pop(),i.trys.pop();continue}a=n.call(t,i)}catch(t){a=[6,t],r=0}finally{e=o=0}if(5&a[0])throw a[1];return{value:a[0]?a[1]:void 0,done:!0}}([a,c])}}}function l(t,n,e){if(e||2===arguments.length)for(var r,o=0,a=n.length;o<a;o++)!r&&o in n||(r||(r=Array.prototype.slice.call(n,0,o)),r[o]=n[o]);return t.concat(r||Array.prototype.slice.call(n))}var f=function(t,n,r){return u(this,void 0,void 0,(function(){return s(this,(function(o){switch(o.label){case 0:return[4,e.create({baseURL:t,timeout:2e4,withCredentials:!1,headers:{"x-swap-jsbridge":"true"}}).get(n,{params:r})];case 1:return[2,o.sent().data]}}))}))};var p=function(t,n){return u(this,void 0,void 0,(function(){var e,r,o;return s(this,(function(a){switch(a.label){case 0:return e=t.split("://"),r=e[0],o=e[1],[4,f(r,"/".concat(o),n)];case 1:return[2,a.sent()]}}))}))},h=function(t){return function(n,e){for(var r=[],a=2;a<arguments.length;a++)r[a-2]=arguments[a];return u(this,void 0,void 0,(function(){var a,i,c;return s(this,(function(u){switch(u.label){case 0:return a=o(),i=a.isMock,c=a.bypassMode,i&&["api","none"].includes(c)?[4,p(n,e).catch((function(){return{}}))]:[3,2];case 1:return[2,u.sent()];case 2:return[2,t.call.apply(t,l([this,n,e],r,!1))]}}))}))}},b=h(t),v=h(n);export{c as _,b as a,v as b,o as g,i as p,a as s,h as w};
+import { call, callWithPromise } from 'swap-jsbridge';
+import axios from 'axios';
+
+const mode = 'MOCK';
+const isMock = false;
+const isOnline = false;
+const baseURL = '';
+const bypassMode = 'none';
+const workerOpt = null;
+const mockData = {};
+const swapJestServer = {};
+const unmatchedMock = {
+    code: 999,
+    msg: '没有匹配到数据',
+};
+
+const store = {
+    mode,
+    isMock,
+    bypassMode,
+    mockData,
+    unmatchedMock,
+    swapJestServer,
+    workerOpt,
+    isOnline,
+    baseURL,
+};
+/**
+ * 获取store中的值，如果没有入参则返回所有
+ * @param key
+ * @returns
+ */
+const getStore = function (key) {
+    if (key) {
+        return store[key];
+    }
+    return store;
+};
+/**
+ * 设置store，并返回store
+ * @param {string} key
+ * @param {any} value
+ * @returns
+ */
+const setStore = function (key, val) {
+    store[key] = val;
+    return store;
+};
+/**
+ * 批处理设置store，并返回store
+ * @param {string} key
+ * @param {any} value
+ * @returns
+ */
+const patchSetStore = function (obj) {
+    Object.entries(obj).forEach(([key, val]) => {
+        setStore(key, val);
+    });
+    return store;
+};
+
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+const request = function (baseURL, url, params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const instance = axios.create({
+            baseURL,
+            timeout: 20000,
+            withCredentials: false,
+            headers: { 'x-swap-jsbridge': 'true' },
+        });
+        const res = yield instance.get(url, { params });
+        return res.data;
+    });
+};
+
+/**
+* @description 获取URL名称
+* @param {string} baseUrl
+* @returns {string}
+*/
+function getURLName(baseUrl) {
+    return baseUrl.split('://');
+}
+/**
+* @description 处理请求
+* @returns {string}
+*/
+const handlerRequest = function (url, param) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const [pre, name] = getURLName(url);
+        return yield request(pre, `/${name}`, param);
+    });
+};
+
+const wrapperCall = function (target) {
+    return function (scheme, param, ...extendOpt) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { isMock, bypassMode } = getStore();
+            if (isMock && (['api', 'none'].includes(bypassMode))) {
+                // jsbridge transform fetch
+                // 如果没有命中mock data则返回空对象
+                return yield handlerRequest(scheme, param).catch(() => ({}));
+            }
+            return target.call(this, scheme, param, ...extendOpt);
+        });
+    };
+};
+const swapCall = wrapperCall(call);
+const swapCallWithPromise = wrapperCall(callWithPromise);
+
+export { swapCall as a, swapCallWithPromise as b, getStore as g, patchSetStore as p, setStore as s, wrapperCall as w };

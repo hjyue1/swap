@@ -21,13 +21,6 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-}) : x)(function(x) {
-  if (typeof require !== "undefined")
-    return require.apply(this, arguments);
-  throw new Error('Dynamic require of "' + x + '" is not supported');
-});
 var __objRest = (source, exclude) => {
   var target = {};
   for (var prop in source)
@@ -43,7 +36,7 @@ var __objRest = (source, exclude) => {
 var __esm = (fn, res) => function __init() {
   return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
-var __commonJS = (cb, mod) => function __require2() {
+var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 var __export = (target, all) => {
@@ -59,10 +52,11 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// node_modules/tsup/assets/esm_shims.js
-var init_esm_shims = __esm({
-  "node_modules/tsup/assets/esm_shims.js"() {
+// node_modules/tsup/assets/cjs_shims.js
+var init_cjs_shims = __esm({
+  "node_modules/tsup/assets/cjs_shims.js"() {
   }
 });
 
@@ -70,7 +64,7 @@ var init_esm_shims = __esm({
 var require_format = __commonJS({
   "node_modules/outvariant/lib/format.js"(exports) {
     "use strict";
-    init_esm_shims();
+    init_cjs_shims();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.format = void 0;
     var POSITIONALS_EXP = /(%?)(%([sdjo]))/g;
@@ -127,7 +121,7 @@ var require_format = __commonJS({
 var require_invariant = __commonJS({
   "node_modules/outvariant/lib/invariant.js"(exports) {
     "use strict";
-    init_esm_shims();
+    init_cjs_shims();
     var __extends = exports && exports.__extends || function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
@@ -216,7 +210,7 @@ var require_invariant = __commonJS({
 var require_lib = __commonJS({
   "node_modules/outvariant/lib/index.js"(exports) {
     "use strict";
-    init_esm_shims();
+    init_cjs_shims();
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
@@ -240,7 +234,30 @@ var require_lib = __commonJS({
 });
 
 // src/index.ts
-init_esm_shims();
+var src_exports = {};
+__export(src_exports, {
+  GraphQLHandler: () => GraphQLHandler,
+  RESTMethods: () => RESTMethods,
+  RequestHandler: () => RequestHandler,
+  RestHandler: () => RestHandler,
+  cleanUrl: () => cleanUrl,
+  compose: () => compose,
+  context: () => context_exports,
+  createResponseComposition: () => createResponseComposition,
+  defaultContext: () => defaultContext,
+  defaultResponse: () => defaultResponse,
+  graphql: () => graphql,
+  graphqlContext: () => graphqlContext,
+  handleRequest: () => handleRequest,
+  matchRequestUrl: () => matchRequestUrl,
+  parseIsomorphicRequest: () => parseIsomorphicRequest,
+  response: () => response,
+  rest: () => rest,
+  restContext: () => restContext,
+  setupWorker: () => setupWorker
+});
+module.exports = __toCommonJS(src_exports);
+init_cjs_shims();
 
 // src/context/index.ts
 var context_exports = {};
@@ -258,29 +275,29 @@ __export(context_exports, {
   text: () => text,
   xml: () => xml
 });
-init_esm_shims();
+init_cjs_shims();
 
 // src/context/status.ts
-init_esm_shims();
-import statuses from "statuses/codes.json";
+init_cjs_shims();
+var import_codes = __toESM(require("statuses/codes.json"));
 var status = (statusCode, statusText) => {
   return (res) => {
     res.status = statusCode;
-    res.statusText = statusText || statuses[String(statusCode)];
+    res.statusText = statusText || import_codes.default[String(statusCode)];
     return res;
   };
 };
 
 // src/context/set.ts
-init_esm_shims();
-import { objectToHeaders } from "headers-polyfill";
+init_cjs_shims();
+var import_headers_polyfill = require("headers-polyfill");
 function set(...args) {
   return (res) => {
     const [name, value] = args;
     if (typeof name === "string") {
       res.headers.append(name, value);
     } else {
-      const headers = objectToHeaders(name);
+      const headers = (0, import_headers_polyfill.objectToHeaders)(name);
       headers.forEach((value2, name2) => {
         res.headers.append(name2, value2);
       });
@@ -290,8 +307,8 @@ function set(...args) {
 }
 
 // src/context/cookie.ts
-init_esm_shims();
-import * as cookieUtils from "cookie";
+init_cjs_shims();
+var cookieUtils = __toESM(require("cookie"));
 var cookie = (name, value, options) => {
   return (res) => {
     const serializedCookie = cookieUtils.serialize(name, value, options);
@@ -304,7 +321,7 @@ var cookie = (name, value, options) => {
 };
 
 // src/context/body.ts
-init_esm_shims();
+init_cjs_shims();
 var body = (value) => {
   return (res) => {
     res.body = value;
@@ -313,10 +330,10 @@ var body = (value) => {
 };
 
 // src/context/data.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/internal/jsonParse.ts
-init_esm_shims();
+init_cjs_shims();
 function jsonParse(value) {
   try {
     return JSON.parse(value);
@@ -326,10 +343,10 @@ function jsonParse(value) {
 }
 
 // src/utils/internal/mergeRight.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/internal/isObject.ts
-init_esm_shims();
+init_cjs_shims();
 function isObject(value) {
   return value != null && typeof value === "object" && !Array.isArray(value);
 }
@@ -352,7 +369,7 @@ function mergeRight(left, right) {
 }
 
 // src/context/json.ts
-init_esm_shims();
+init_cjs_shims();
 var json = (body2) => {
   return (res) => {
     res.headers.set("Content-Type", "application/json");
@@ -371,7 +388,7 @@ var data = (payload) => {
 };
 
 // src/context/extensions.ts
-init_esm_shims();
+init_cjs_shims();
 var extensions = (payload) => {
   return (res) => {
     const prevBody = jsonParse(res.body) || {};
@@ -381,14 +398,14 @@ var extensions = (payload) => {
 };
 
 // src/context/delay.ts
-init_esm_shims();
-import { isNodeProcess } from "is-node-process";
+init_cjs_shims();
+var import_is_node_process = require("is-node-process");
 var SET_TIMEOUT_MAX_ALLOWED_INT = 2147483647;
 var MIN_SERVER_RESPONSE_TIME = 100;
 var MAX_SERVER_RESPONSE_TIME = 400;
 var NODE_SERVER_RESPONSE_TIME = 5;
 var getRandomServerResponseTime = () => {
-  if (isNodeProcess()) {
+  if ((0, import_is_node_process.isNodeProcess)()) {
     return NODE_SERVER_RESPONSE_TIME;
   }
   return Math.floor(Math.random() * (MAX_SERVER_RESPONSE_TIME - MIN_SERVER_RESPONSE_TIME) + MIN_SERVER_RESPONSE_TIME);
@@ -424,7 +441,7 @@ var delay = (durationOrMode) => {
 };
 
 // src/context/errors.ts
-init_esm_shims();
+init_cjs_shims();
 var errors = (errorsList) => {
   return (res) => {
     if (errorsList == null) {
@@ -437,12 +454,12 @@ var errors = (errorsList) => {
 };
 
 // src/context/fetch.ts
-init_esm_shims();
-import { isNodeProcess as isNodeProcess2 } from "is-node-process";
-import { Headers } from "headers-polyfill";
-var useFetch = isNodeProcess2() ? __require("node-fetch") : window.fetch;
+init_cjs_shims();
+var import_is_node_process2 = require("is-node-process");
+var import_headers_polyfill2 = require("headers-polyfill");
+var useFetch = (0, import_is_node_process2.isNodeProcess)() ? require("node-fetch") : window.fetch;
 var augmentRequestInit = (requestInit) => {
-  const headers = new Headers(requestInit.headers);
+  const headers = new import_headers_polyfill2.Headers(requestInit.headers);
   headers.set("x-msw-bypass", "true");
   return __spreadProps(__spreadValues({}, requestInit), {
     headers: headers.all()
@@ -473,7 +490,7 @@ var fetch = (input, requestInit = {}) => {
 };
 
 // src/context/text.ts
-init_esm_shims();
+init_cjs_shims();
 var text = (body2) => {
   return (res) => {
     res.headers.set("Content-Type", "text/plain");
@@ -483,7 +500,7 @@ var text = (body2) => {
 };
 
 // src/context/xml.ts
-init_esm_shims();
+init_cjs_shims();
 var xml = (body2) => {
   return (res) => {
     res.headers.set("Content-Type", "text/xml");
@@ -493,20 +510,20 @@ var xml = (body2) => {
 };
 
 // src/setupWorker/setupWorker.ts
-init_esm_shims();
-import { isNodeProcess as isNodeProcess3 } from "is-node-process";
-import { StrictEventEmitter } from "strict-event-emitter";
+init_cjs_shims();
+var import_is_node_process3 = require("is-node-process");
+var import_strict_event_emitter = require("strict-event-emitter");
 
 // src/setupWorker/start/createStartHandler.ts
-init_esm_shims();
-import { until as until4 } from "@open-draft/until";
+init_cjs_shims();
+var import_until4 = require("@open-draft/until");
 
 // src/setupWorker/start/utils/getWorkerInstance.ts
-init_esm_shims();
-import { until } from "@open-draft/until";
+init_cjs_shims();
+var import_until = require("@open-draft/until");
 
 // src/setupWorker/start/utils/getWorkerByRegistration.ts
-init_esm_shims();
+init_cjs_shims();
 var getWorkerByRegistration = (registration, absoluteWorkerUrl, findWorker) => {
   const allStates = [
     registration.active,
@@ -521,13 +538,13 @@ var getWorkerByRegistration = (registration, absoluteWorkerUrl, findWorker) => {
 };
 
 // src/utils/url/getAbsoluteWorkerUrl.ts
-init_esm_shims();
+init_cjs_shims();
 function getAbsoluteWorkerUrl(relativeUrl) {
   return new URL(relativeUrl, location.origin).href;
 }
 
 // src/utils/internal/devUtils.ts
-init_esm_shims();
+init_cjs_shims();
 var import_outvariant = __toESM(require_lib());
 var LIBRARY_PREFIX = "[MSW]";
 function formatMessage(message, ...positionals) {
@@ -562,7 +579,7 @@ var getWorkerInstance = async (url, options = {}, findWorker) => {
       ];
     });
   }
-  const [error2, instance] = await until(async () => {
+  const [error2, instance] = await (0, import_until.until)(async () => {
     const registration = await navigator.serviceWorker.register(url, options);
     return [
       getWorkerByRegistration(registration, absoluteWorkerUrl, findWorker),
@@ -585,10 +602,10 @@ Learn more about creating the Service Worker script: https://mswjs.io/docs/cli/i
 };
 
 // src/setupWorker/start/utils/enableMocking.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/setupWorker/start/utils/printStartMessage.ts
-init_esm_shims();
+init_cjs_shims();
 function printStartMessage(args = {}) {
   if (args.quiet) {
     return;
@@ -624,10 +641,10 @@ async function enableMocking(context, options) {
 }
 
 // src/utils/worker/createRequestListener.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/createBroadcastChannel.ts
-init_esm_shims();
+init_cjs_shims();
 var createBroadcastChannel = (event) => {
   const port = event.ports[0];
   return {
@@ -640,7 +657,7 @@ var createBroadcastChannel = (event) => {
 };
 
 // src/utils/NetworkError.ts
-init_esm_shims();
+init_cjs_shims();
 var NetworkError = class extends Error {
   constructor(message) {
     super(message);
@@ -649,19 +666,19 @@ var NetworkError = class extends Error {
 };
 
 // src/utils/request/parseWorkerRequest.ts
-init_esm_shims();
-import { Headers as Headers4 } from "headers-polyfill";
+init_cjs_shims();
+var import_headers_polyfill6 = require("headers-polyfill");
 
 // src/handlers/RequestHandler.ts
-init_esm_shims();
-import { Headers as Headers3 } from "headers-polyfill";
+init_cjs_shims();
+var import_headers_polyfill4 = require("headers-polyfill");
 
 // src/response.ts
-init_esm_shims();
-import { Headers as Headers2 } from "headers-polyfill";
+init_cjs_shims();
+var import_headers_polyfill3 = require("headers-polyfill");
 
 // src/utils/internal/compose.ts
-init_esm_shims();
+init_cjs_shims();
 function compose(...fns) {
   return (...args) => {
     return fns.reduceRight((leftFn, rightFn) => {
@@ -683,7 +700,7 @@ var defaultResponseTransformers = [];
 function createResponseComposition(responseOverrides, defaultTransformers = defaultResponseTransformers) {
   return async (...transformers) => {
     const initialResponse = Object.assign({}, defaultResponse, {
-      headers: new Headers2({
+      headers: new import_headers_polyfill3.Headers({
         "x-powered-by": "msw"
       })
     }, responseOverrides);
@@ -703,7 +720,7 @@ var response = Object.assign(createResponseComposition(), {
 });
 
 // src/utils/internal/getCallFrame.ts
-init_esm_shims();
+init_cjs_shims();
 var SOURCE_FRAME = /\/msw\/src\/(.+)/;
 var BUILD_FRAME = /(node_modules)?[\/\\]lib[\/\\](umd|esm|iief|cjs)[\/\\]|^[^\/\\]*$/;
 function getCallFrame(error2) {
@@ -723,7 +740,7 @@ function getCallFrame(error2) {
 }
 
 // src/utils/internal/isIterable.ts
-init_esm_shims();
+init_cjs_shims();
 function isIterable(fn) {
   if (!fn) {
     return false;
@@ -805,7 +822,7 @@ function passthrough() {
   return {
     status: 101,
     statusText: "Continue",
-    headers: new Headers3(),
+    headers: new import_headers_polyfill4.Headers(),
     body: null,
     passthrough: true,
     once: false
@@ -813,13 +830,13 @@ function passthrough() {
 }
 
 // src/utils/request/setRequestCookies.ts
-init_esm_shims();
-import * as cookieUtils3 from "cookie";
-import { store } from "@mswjs/cookies";
+init_cjs_shims();
+var cookieUtils3 = __toESM(require("cookie"));
+var import_cookies = require("@mswjs/cookies");
 
 // src/utils/request/getRequestCookies.ts
-init_esm_shims();
-import * as cookieUtils2 from "cookie";
+init_cjs_shims();
+var cookieUtils2 = __toESM(require("cookie"));
 function getAllCookies() {
   return cookieUtils2.parse(document.cookie);
 }
@@ -844,8 +861,8 @@ function getRequestCookies(request) {
 function setRequestCookies(request) {
   var _a;
   const requestCookiesString = request.headers.get("cookie");
-  store.hydrate();
-  const cookiesFromStore = Array.from((_a = store.get(__spreadProps(__spreadValues({}, request), { url: request.url.toString() }))) == null ? void 0 : _a.entries()).reduce((cookies, [name, { value }]) => {
+  import_cookies.store.hydrate();
+  const cookiesFromStore = Array.from((_a = import_cookies.store.get(__spreadProps(__spreadValues({}, request), { url: request.url.toString() }))) == null ? void 0 : _a.entries()).reduce((cookies, [name, { value }]) => {
     return Object.assign(cookies, { [name.trim()]: value });
   }, {});
   const cookiesFromDocument = getRequestCookies(request);
@@ -858,14 +875,14 @@ function setRequestCookies(request) {
 }
 
 // src/utils/request/parseBody.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/internal/parseMultipartData.ts
-init_esm_shims();
-import { stringToHeaders } from "headers-polyfill";
+init_cjs_shims();
+var import_headers_polyfill5 = require("headers-polyfill");
 function parseContentHeaders(headersString) {
   var _a, _b;
-  const headers = stringToHeaders(headersString);
+  const headers = (0, import_headers_polyfill5.stringToHeaders)(headersString);
   const contentType = headers.get("content-type") || "text/plain";
   const disposition = headers.get("content-disposition");
   if (!disposition) {
@@ -940,10 +957,10 @@ function parseBody(body2, headers) {
 }
 
 // src/utils/request/pruneGetRequestBody.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/internal/isStringEqual.ts
-init_esm_shims();
+init_cjs_shims();
 function isStringEqual(actual, expected) {
   return actual.toLowerCase() === expected.toLowerCase();
 }
@@ -975,7 +992,7 @@ function parseWorkerRequest(rawRequest) {
     destination: rawRequest.destination,
     body: pruneGetRequestBody(rawRequest),
     bodyUsed: rawRequest.bodyUsed,
-    headers: new Headers4(rawRequest.headers),
+    headers: new import_headers_polyfill6.Headers(rawRequest.headers),
     passthrough
   };
   setRequestCookies(request);
@@ -984,11 +1001,11 @@ function parseWorkerRequest(rawRequest) {
 }
 
 // src/utils/handleRequest.ts
-init_esm_shims();
-import { until as until2 } from "@open-draft/until";
+init_cjs_shims();
+var import_until2 = require("@open-draft/until");
 
 // src/utils/getResponse.ts
-init_esm_shims();
+init_cjs_shims();
 var getResponse = async (request, handlers, resolutionContext) => {
   const relevantHandlers = handlers.filter((handler) => {
     return handler.test(request, resolutionContext);
@@ -1036,17 +1053,15 @@ var getResponse = async (request, handlers, resolutionContext) => {
 };
 
 // src/utils/request/onUnhandledRequest.ts
-init_esm_shims();
-import getStringMatchScore from "js-levenshtein";
+init_cjs_shims();
+var import_js_levenshtein = __toESM(require("js-levenshtein"));
 
 // src/utils/internal/parseGraphQLRequest.ts
-init_esm_shims();
-import {
-  parse as parse3
-} from "graphql";
+init_cjs_shims();
+var import_graphql = require("graphql");
 
 // src/utils/request/getPublicUrlFromRequest.ts
-init_esm_shims();
+init_cjs_shims();
 var getPublicUrlFromRequest = (request) => {
   return request.referrer.startsWith(request.url.origin) ? request.url.pathname : new URL(request.url.pathname, `${request.url.protocol}//${request.url.host}`).href;
 };
@@ -1064,7 +1079,7 @@ function parseDocumentNode(node) {
 }
 function parseQuery(query) {
   try {
-    const ast = parse3(query);
+    const ast = (0, import_graphql.parse)(query);
     return parseDocumentNode(ast);
   } catch (error2) {
     return error2;
@@ -1147,10 +1162,10 @@ function parseGraphQLRequest(request) {
 }
 
 // src/handlers/RestHandler.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/logging/getStatusCodeColor.ts
-init_esm_shims();
+init_cjs_shims();
 function getStatusCodeColor(status2) {
   if (status2 < 300) {
     return "#69AB32" /* Success */;
@@ -1162,14 +1177,14 @@ function getStatusCodeColor(status2) {
 }
 
 // src/utils/logging/getTimestamp.ts
-init_esm_shims();
+init_cjs_shims();
 function getTimestamp() {
   const now = new Date();
   return [now.getHours(), now.getMinutes(), now.getSeconds()].map(String).map((chunk) => chunk.slice(0, 2)).map((chunk) => chunk.padStart(2, "0")).join(":");
 }
 
 // src/utils/logging/prepareRequest.ts
-init_esm_shims();
+init_cjs_shims();
 function prepareRequest(request) {
   return __spreadProps(__spreadValues({}, request), {
     headers: request.headers.all()
@@ -1177,25 +1192,25 @@ function prepareRequest(request) {
 }
 
 // src/utils/logging/prepareResponse.ts
-init_esm_shims();
-import { objectToHeaders as objectToHeaders2 } from "headers-polyfill";
+init_cjs_shims();
+var import_headers_polyfill7 = require("headers-polyfill");
 function prepareResponse(res) {
-  const responseHeaders = objectToHeaders2(res.headers);
+  const responseHeaders = (0, import_headers_polyfill7.objectToHeaders)(res.headers);
   return __spreadProps(__spreadValues({}, res), {
     body: parseBody(res.body, responseHeaders)
   });
 }
 
 // src/utils/matching/matchRequestUrl.ts
-init_esm_shims();
-import { match } from "path-to-regexp";
-import { getCleanUrl } from "@mswjs/interceptors/lib/utils/getCleanUrl";
+init_cjs_shims();
+var import_path_to_regexp = require("path-to-regexp");
+var import_getCleanUrl = require("@mswjs/interceptors/lib/utils/getCleanUrl");
 
 // src/utils/matching/normalizePath.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/url/cleanUrl.ts
-init_esm_shims();
+init_cjs_shims();
 var REDUNDANT_CHARACTERS_EXP = /[\?|#].*$/g;
 function getSearchParams(path) {
   return new URL(`/${path}`, "http://localhost").searchParams;
@@ -1205,10 +1220,10 @@ function cleanUrl(path) {
 }
 
 // src/utils/url/getAbsoluteUrl.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/url/isAbsoluteUrl.ts
-init_esm_shims();
+init_cjs_shims();
 function isAbsoluteUrl(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 }
@@ -1247,8 +1262,8 @@ function coercePath(path) {
 function matchRequestUrl(url, path, baseUrl) {
   const normalizedPath = normalizePath(path, baseUrl);
   const cleanPath = typeof normalizedPath === "string" ? coercePath(normalizedPath) : normalizedPath;
-  const cleanUrl2 = getCleanUrl(url);
-  const result = match(cleanPath, { decode: decodeURIComponent })(cleanUrl2);
+  const cleanUrl2 = (0, import_getCleanUrl.getCleanUrl)(url);
+  const result = (0, import_path_to_regexp.match)(cleanPath, { decode: decodeURIComponent })(cleanUrl2);
   const params = result && result.params || {};
   return {
     matches: result !== false,
@@ -1332,10 +1347,10 @@ var RestHandler = class extends RequestHandler {
 };
 
 // src/handlers/GraphQLHandler.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/internal/tryCatch.ts
-init_esm_shims();
+init_cjs_shims();
 function tryCatch(fn, onException) {
   try {
     const result = fn();
@@ -1447,7 +1462,7 @@ function getRestHandlerScore() {
     const hasSameMethod = isStringEqual(request.method, method);
     const methodScoreDelta = hasSameMethod ? TYPE_MATCH_DELTA : 0;
     const requestPublicUrl = getPublicUrlFromRequest(request);
-    const score = getStringMatchScore(requestPublicUrl, path);
+    const score = (0, import_js_levenshtein.default)(requestPublicUrl, path);
     return score - methodScoreDelta;
   };
 }
@@ -1462,7 +1477,7 @@ function getGraphQLHandlerScore(parsedQuery) {
     }
     const hasSameOperationType = parsedQuery.operationType === operationType;
     const operationTypeScoreDelta = hasSameOperationType ? TYPE_MATCH_DELTA : 0;
-    const score = getStringMatchScore(parsedQuery.operationName, operationName);
+    const score = (0, import_js_levenshtein.default)(parsedQuery.operationName, operationName);
     return score - operationTypeScoreDelta;
   };
 }
@@ -1530,11 +1545,11 @@ Read more: https://mswjs.io/docs/getting-started/mocks`
 }
 
 // src/utils/request/readResponseCookies.ts
-init_esm_shims();
-import { store as store2 } from "@mswjs/cookies";
+init_cjs_shims();
+var import_cookies2 = require("@mswjs/cookies");
 function readResponseCookies(request, response2) {
-  store2.add(__spreadProps(__spreadValues({}, request), { url: request.url.toString() }), response2);
-  store2.persist();
+  import_cookies2.store.add(__spreadProps(__spreadValues({}, request), { url: request.url.toString() }), response2);
+  import_cookies2.store.persist();
 }
 
 // src/utils/handleRequest.ts
@@ -1546,7 +1561,7 @@ async function handleRequest(request, handlers, options, emitter, handleRequestO
     (_a = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _a.call(handleRequestOptions, request);
     return;
   }
-  const [lookupError, lookupResult] = await until2(() => {
+  const [lookupError, lookupResult] = await (0, import_until2.until)(() => {
     return getResponse(request, handlers, handleRequestOptions == null ? void 0 : handleRequestOptions.resolutionContext);
   });
   if (lookupError) {
@@ -1648,7 +1663,7 @@ var createRequestListener = (context, options) => {
 };
 
 // src/utils/internal/requestIntegrityCheck.ts
-init_esm_shims();
+init_cjs_shims();
 async function requestIntegrityCheck(context, serviceWorker) {
   context.workerChannel.send("INTEGRITY_CHECK_REQUEST");
   const { payload: actualChecksum } = await context.events.once("INTEGRITY_CHECK_RESPONSE");
@@ -1659,26 +1674,26 @@ async function requestIntegrityCheck(context, serviceWorker) {
 }
 
 // src/utils/deferNetworkRequestsUntil.ts
-init_esm_shims();
-import { until as until3 } from "@open-draft/until";
+init_cjs_shims();
+var import_until3 = require("@open-draft/until");
 function deferNetworkRequestsUntil(predicatePromise) {
   const originalXhrSend = window.XMLHttpRequest.prototype.send;
   window.XMLHttpRequest.prototype.send = function(...args) {
-    until3(() => predicatePromise).then(() => {
+    (0, import_until3.until)(() => predicatePromise).then(() => {
       window.XMLHttpRequest.prototype.send = originalXhrSend;
       this.send(...args);
     });
   };
   const originalFetch = window.fetch;
   window.fetch = async (...args) => {
-    await until3(() => predicatePromise);
+    await (0, import_until3.until)(() => predicatePromise);
     window.fetch = originalFetch;
     return window.fetch(...args);
   };
 }
 
 // src/utils/worker/createResponseListener.ts
-init_esm_shims();
+init_cjs_shims();
 function createResponseListener(context) {
   return (_, message) => {
     var _a;
@@ -1697,7 +1712,7 @@ function createResponseListener(context) {
 }
 
 // src/setupWorker/start/utils/validateWorkerScope.ts
-init_esm_shims();
+init_cjs_shims();
 function validateWorkerScope(registration, options) {
   if (!(options == null ? void 0 : options.quiet) && !location.href.startsWith(registration.scope)) {
     devUtils.warn(`Cannot intercept requests on this page because it's outside of the worker's scope ("${registration.scope}"). If you wish to mock API requests on this page, you must resolve this scope issue.
@@ -1736,7 +1751,7 @@ Please consider using a custom "serviceWorker.url" option to point to the actual
         }
         window.clearInterval(context.keepAliveInterval);
       });
-      const [integrityError] = await until4(() => requestIntegrityCheck(context, worker));
+      const [integrityError] = await (0, import_until4.until)(() => requestIntegrityCheck(context, worker));
       if (integrityError) {
         devUtils.error(`Detected outdated Service Worker: ${integrityError.message}
 
@@ -1775,10 +1790,10 @@ If this message still persists after updating, please report an issue: https://g
 };
 
 // src/setupWorker/stop/createStop.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/setupWorker/stop/utils/printStopMessage.ts
-init_esm_shims();
+init_cjs_shims();
 function printStopMessage(args = {}) {
   if (args.quiet) {
     return;
@@ -1802,7 +1817,7 @@ var createStop = (context) => {
 };
 
 // src/utils/internal/requestHandlerUtils.ts
-init_esm_shims();
+init_cjs_shims();
 function use(currentHandlers, ...handlers) {
   currentHandlers.unshift(...handlers);
 }
@@ -1816,7 +1831,7 @@ function resetHandlers(initialHandlers, ...nextHandlers) {
 }
 
 // src/setupWorker/start/utils/prepareStartHandler.ts
-init_esm_shims();
+init_cjs_shims();
 var DEFAULT_START_OPTIONS = {
   serviceWorker: {
     url: "/mockServiceWorker.js",
@@ -1840,16 +1855,16 @@ function prepareStartHandler(handler, context) {
 }
 
 // src/setupWorker/start/createFallbackStart.ts
-init_esm_shims();
+init_cjs_shims();
 
 // src/utils/worker/createFallbackRequestListener.ts
-init_esm_shims();
-import { createInterceptor } from "@mswjs/interceptors";
-import { interceptFetch } from "@mswjs/interceptors/lib/interceptors/fetch";
-import { interceptXMLHttpRequest } from "@mswjs/interceptors/lib/interceptors/XMLHttpRequest";
+init_cjs_shims();
+var import_interceptors = require("@mswjs/interceptors");
+var import_fetch3 = require("@mswjs/interceptors/lib/interceptors/fetch");
+var import_XMLHttpRequest = require("@mswjs/interceptors/lib/interceptors/XMLHttpRequest");
 
 // src/utils/request/parseIsomorphicRequest.ts
-init_esm_shims();
+init_cjs_shims();
 function parseIsomorphicRequest(request) {
   const mockedRequest = {
     id: request.id,
@@ -1876,8 +1891,8 @@ function parseIsomorphicRequest(request) {
 
 // src/utils/worker/createFallbackRequestListener.ts
 function createFallbackRequestListener(context, options) {
-  const interceptor = createInterceptor({
-    modules: [interceptFetch, interceptXMLHttpRequest],
+  const interceptor = (0, import_interceptors.createInterceptor)({
+    modules: [import_fetch3.interceptFetch, import_XMLHttpRequest.interceptXMLHttpRequest],
     async resolver(request) {
       const mockedRequest = parseIsomorphicRequest(request);
       return handleRequest(mockedRequest, context.requestHandlers, options, context.emitter, {
@@ -1914,7 +1929,7 @@ function createFallbackStart(context) {
 }
 
 // src/setupWorker/stop/createFallbackStop.ts
-init_esm_shims();
+init_cjs_shims();
 function createFallbackStop(context) {
   return function stop() {
     var _a, _b;
@@ -1924,7 +1939,7 @@ function createFallbackStop(context) {
 }
 
 // src/utils/internal/pipeEvents.ts
-init_esm_shims();
+init_cjs_shims();
 function pipeEvents(source, destination) {
   const rawEmit = source.emit;
   if (rawEmit._isPiped) {
@@ -1944,11 +1959,11 @@ function setupWorker(...requestHandlers) {
     if (Array.isArray(handler))
       throw new Error(devUtils.formatMessage('Failed to call "setupWorker" given an Array of request handlers (setupWorker([a, b])), expected to receive each handler individually: setupWorker(a, b).'));
   });
-  if (isNodeProcess3()) {
+  if ((0, import_is_node_process3.isNodeProcess)()) {
     throw new Error(devUtils.formatMessage("Failed to execute `setupWorker` in a non-browser environment. Consider using `setupServer` for Node.js environment instead."));
   }
-  const emitter = new StrictEventEmitter();
-  const publicEmitter = new StrictEventEmitter();
+  const emitter = new import_strict_event_emitter.StrictEventEmitter();
+  const publicEmitter = new import_strict_event_emitter.StrictEventEmitter();
   pipeEvents(emitter, publicEmitter);
   const context = {
     isMockingEnabled: false,
@@ -2061,7 +2076,7 @@ function setupWorker(...requestHandlers) {
 }
 
 // src/rest.ts
-init_esm_shims();
+init_cjs_shims();
 function createRestHandler(method) {
   return (path, resolver) => {
     return new RestHandler(method, path, resolver);
@@ -2079,8 +2094,8 @@ var rest = {
 };
 
 // src/graphql.ts
-init_esm_shims();
-import { OperationTypeNode as OperationTypeNode2 } from "graphql";
+init_cjs_shims();
+var import_graphql2 = require("graphql");
 function createScopedGraphQLHandler(operationType, url) {
   return (operationName, resolver) => {
     return new GraphQLHandler(operationType, operationName, url, resolver);
@@ -2093,27 +2108,28 @@ function createGraphQLOperationHandler(url) {
 }
 var standardGraphQLHandlers = {
   operation: createGraphQLOperationHandler("*"),
-  query: createScopedGraphQLHandler(OperationTypeNode2.QUERY, "*"),
-  mutation: createScopedGraphQLHandler(OperationTypeNode2.MUTATION, "*")
+  query: createScopedGraphQLHandler(import_graphql2.OperationTypeNode.QUERY, "*"),
+  mutation: createScopedGraphQLHandler(import_graphql2.OperationTypeNode.MUTATION, "*")
 };
 function createGraphQLLink(url) {
   return {
     operation: createGraphQLOperationHandler(url),
-    query: createScopedGraphQLHandler(OperationTypeNode2.QUERY, url),
-    mutation: createScopedGraphQLHandler(OperationTypeNode2.MUTATION, url)
+    query: createScopedGraphQLHandler(import_graphql2.OperationTypeNode.QUERY, url),
+    mutation: createScopedGraphQLHandler(import_graphql2.OperationTypeNode.MUTATION, url)
   };
 }
 var graphql = __spreadProps(__spreadValues({}, standardGraphQLHandlers), {
   link: createGraphQLLink
 });
-export {
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
   GraphQLHandler,
   RESTMethods,
   RequestHandler,
   RestHandler,
   cleanUrl,
   compose,
-  context_exports as context,
+  context,
   createResponseComposition,
   defaultContext,
   defaultResponse,
@@ -2126,5 +2142,5 @@ export {
   rest,
   restContext,
   setupWorker
-};
+});
 //# sourceMappingURL=index.js.map

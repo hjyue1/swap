@@ -9,14 +9,14 @@ import {
 
 export const DEFAULT_START_OPTIONS: RequiredDeep<StartOptions> = {
   serviceWorker: {
-    url: '/mockServiceWorker.js',
+    url: '/swapSW.js',
     options: null as any,
   },
   quiet: false,
   waitUntilReady: true,
   onUnhandledRequest: 'warn',
-  findWorker(scriptURL, mockServiceWorkerUrl) {
-    return scriptURL === mockServiceWorkerUrl
+  findWorker(scriptURL, swapSWUrl) {
+    return scriptURL === swapSWUrl
   },
 }
 

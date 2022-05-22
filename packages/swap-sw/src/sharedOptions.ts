@@ -11,7 +11,20 @@ export interface SharedOptions {
    * @example worker.start({ onUnhandledRequest: 'warn' })
    * @example server.listen({ onUnhandledRequest: 'error' })
    */
-  onUnhandledRequest?: UnhandledRequestStrategy
+  onUnhandledRequest?: UnhandledRequestStrategy;
+  /**
+   * A custom bypass mode to bypass a request in the list
+   * of all request on the page.
+   */
+   bypassMode?: 'none' | 'api' | 'jsbridge';
+   /**
+    * Whether to enable online mock mode
+    */
+   isOnline?: boolean;
+   /**
+    * The prefix address of the resource
+    */
+   baseURL?: string;
 }
 
 export interface LifeCycleEventsMap<ResponseType> {

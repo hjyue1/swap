@@ -61,7 +61,7 @@ export function workerScriptPlugin(): Plugin {
 
       hasRunAlready = true
 
-      build.onLoad({ filter: /mockServiceWorker\.js$/ }, async () => {
+      build.onLoad({ filter: /swapSW\.js$/ }, async () => {
         return {
           // Prevent the worker script from being transpiled.
           // But, generally, the worker script is not in the entrypoints.

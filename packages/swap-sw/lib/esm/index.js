@@ -250,7 +250,6 @@ __export(context_exports, {
   data: () => data,
   delay: () => delay,
   errors: () => errors,
-  extensions: () => extensions,
   fetch: () => fetch,
   json: () => json,
   set: () => set,
@@ -370,19 +369,21 @@ var data = (payload) => {
   };
 };
 
-// src/context/extensions.ts
-init_esm_shims();
-var extensions = (payload) => {
-  return (res) => {
-    const prevBody = jsonParse(res.body) || {};
-    const nextBody = mergeRight(prevBody, { extensions: payload });
-    return json(nextBody)(res);
-  };
-};
-
 // src/context/delay.ts
 init_esm_shims();
-import { isNodeProcess } from "is-node-process";
+
+// src/utils/internal/isNodeProcess.ts
+init_esm_shims();
+function isNodeProcess() {
+  if (typeof global !== "object") {
+    return false;
+  }
+  if (Object.prototype.toString.call(global.process) === "[object process]" || navigator.product === "ReactNative") {
+    return true;
+  }
+}
+
+// src/context/delay.ts
 var SET_TIMEOUT_MAX_ALLOWED_INT = 2147483647;
 var MIN_SERVER_RESPONSE_TIME = 100;
 var MAX_SERVER_RESPONSE_TIME = 400;
@@ -438,12 +439,11 @@ var errors = (errorsList) => {
 
 // src/context/fetch.ts
 init_esm_shims();
-import { isNodeProcess as isNodeProcess2 } from "is-node-process";
 import { Headers } from "headers-polyfill";
-var useFetch = isNodeProcess2() ? __require("node-fetch") : window.fetch;
+var useFetch = isNodeProcess() ? __require("node-fetch") : window.fetch;
 var augmentRequestInit = (requestInit) => {
   const headers = new Headers(requestInit.headers);
-  headers.set("x-msw-bypass", "true");
+  headers.set("x-swap-bypass", "true");
   return __spreadProps(__spreadValues({}, requestInit), {
     headers: headers.all()
   });
@@ -494,7 +494,7 @@ var xml = (body2) => {
 
 // src/setupWorker/setupWorker.ts
 init_esm_shims();
-import { isNodeProcess as isNodeProcess3 } from "is-node-process";
+import { isNodeProcess as isNodeProcess2 } from "is-node-process";
 import { StrictEventEmitter } from "strict-event-emitter";
 
 // src/setupWorker/start/createStartHandler.ts
@@ -529,7 +529,7 @@ function getAbsoluteWorkerUrl(relativeUrl) {
 // src/utils/internal/devUtils.ts
 init_esm_shims();
 var import_outvariant = __toESM(require_lib());
-var LIBRARY_PREFIX = "[MSW]";
+var LIBRARY_PREFIX = "[SWAP]";
 function formatMessage(message, ...positionals) {
   const interpolatedMessage = (0, import_outvariant.format)(message, ...positionals);
   return `${LIBRARY_PREFIX} ${interpolatedMessage}`;
@@ -575,9 +575,7 @@ var getWorkerInstance = async (url, options = {}, findWorker) => {
       const scopeUrl = new URL((options == null ? void 0 : options.scope) || "/", location.href);
       throw new Error(devUtils.formatMessage(`Failed to register a Service Worker for scope ('${scopeUrl.href}') with script ('${absoluteWorkerUrl}'): Service Worker script does not exist at the given path.
 
-Did you forget to run "npx msw init <PUBLIC_DIR>"?
-
-Learn more about creating the Service Worker script: https://mswjs.io/docs/cli/init`));
+Did you forget to run "npx msw init <PUBLIC_DIR>"?`));
     }
     throw new Error(devUtils.formatMessage("Failed to register the Service Worker:\n\n%s", error2.message));
   }
@@ -596,7 +594,6 @@ function printStartMessage(args = {}) {
   const message = args.message || "Mocking enabled.";
   console.groupCollapsed(`%c${devUtils.formatMessage(message)}`, "color:orangered;font-weight:bold;");
   console.log("%cDocumentation: %chttps://mswjs.io/docs", "font-weight:bold", "font-weight:normal");
-  console.log("Found an issue? https://github.com/mswjs/msw/issues");
   if (args.workerUrl) {
     console.log("Worker script URL:", args.workerUrl);
   }
@@ -684,7 +681,7 @@ function createResponseComposition(responseOverrides, defaultTransformers = defa
   return async (...transformers) => {
     const initialResponse = Object.assign({}, defaultResponse, {
       headers: new Headers2({
-        "x-powered-by": "msw"
+        "x-powered-by": "swap"
       })
     }, responseOverrides);
     const resolvedTransformers = [
@@ -1334,6 +1331,16 @@ var RestHandler = class extends RequestHandler {
 // src/handlers/GraphQLHandler.ts
 init_esm_shims();
 
+// src/context/extensions.ts
+init_esm_shims();
+var extensions = (payload) => {
+  return (res) => {
+    const prevBody = jsonParse(res.body) || {};
+    const nextBody = mergeRight(prevBody, { extensions: payload });
+    return json(nextBody)(res);
+  };
+};
+
 // src/utils/internal/tryCatch.ts
 init_esm_shims();
 function tryCatch(fn, onException) {
@@ -1399,7 +1406,8 @@ var GraphQLHandler = class extends RequestHandler {
       const publicUrl = getPublicUrlFromRequest(request);
       devUtils.warn(`Failed to intercept a GraphQL request at "${request.method} ${publicUrl}": anonymous GraphQL operations are not supported.
 
-Consider naming this operation or using "graphql.operation" request handler to intercept GraphQL requests regardless of their operation name/type. Read more: https://mswjs.io/docs/api/graphql/operation      `);
+Consider naming this operation or using "graphql.operation" request handler to intercept GraphQL requests regardless of their operation name/type.
+      `);
       return false;
     }
     const hasMatchingUrl = matchRequestUrl(request.url, this.endpoint);
@@ -1498,7 +1506,7 @@ function onUnhandledRequest(request, handlers, strategy = "warn") {
       `  \u2022 ${requestHeader}`,
       handlerSuggestion,
       `If you still wish to intercept this unhandled request, please create a request handler for it.
-Read more: https://mswjs.io/docs/getting-started/mocks`
+`
     ].filter(Boolean);
     return messageTemplate.join("\n\n");
   }
@@ -1537,13 +1545,34 @@ function readResponseCookies(request, response2) {
   store2.persist();
 }
 
+// src/utils/matching/bypassUrl.ts
+init_esm_shims();
+var isBypass = function(requestURL) {
+  const bypassRegExp = [
+    /^(http|https):\/\/([\w\W]+)\/sockjs-node\/info/gi,
+    /^(http|https):\/\/([\w\W]+)\/([\w\W]+).hot-update/gi
+  ];
+  return bypassRegExp.some(function(item) {
+    if (requestURL.match(item)) {
+      return true;
+    }
+  });
+};
+
 // src/utils/handleRequest.ts
 async function handleRequest(request, handlers, options, emitter, handleRequestOptions) {
-  var _a, _b, _c, _d;
+  var _a, _b, _c, _d, _e, _f, _g;
   emitter.emit("request:start", request);
-  if (request.headers.get("x-msw-bypass") === "true") {
+  if (request.headers.get("x-swap-bypass") === "true" || isBypass(request.url.href)) {
     emitter.emit("request:end", request);
     (_a = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _a.call(handleRequestOptions, request);
+    return;
+  }
+  if (options.bypassMode === "api" && ((_b = request.headers) == null ? void 0 : _b.get("x-swap-jsbridge")) !== "true" || options.bypassMode === "jsbridge" && ((_c = request.headers) == null ? void 0 : _c.get("x-swap-jsbridge")) === "true") {
+    onUnhandledRequest(request, handlers, options.onUnhandledRequest);
+    emitter.emit("request:unhandled", request);
+    emitter.emit("request:end", request);
+    (_d = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _d.call(handleRequestOptions, request);
     return;
   }
   const [lookupError, lookupResult] = await until2(() => {
@@ -1558,7 +1587,7 @@ async function handleRequest(request, handlers, options, emitter, handleRequestO
     onUnhandledRequest(request, handlers, options.onUnhandledRequest);
     emitter.emit("request:unhandled", request);
     emitter.emit("request:end", request);
-    (_b = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _b.call(handleRequestOptions, request);
+    (_e = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _e.call(handleRequestOptions, request);
     return;
   }
   if (!response2) {
@@ -1567,12 +1596,12 @@ async function handleRequest(request, handlers, options, emitter, handleRequestO
   \u2022 %s
     %s`, response2, handler.info.header, handler.info.callFrame);
     emitter.emit("request:end", request);
-    (_c = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _c.call(handleRequestOptions, request);
+    (_f = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _f.call(handleRequestOptions, request);
     return;
   }
   if (response2.passthrough) {
     emitter.emit("request:end", request);
-    (_d = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _d.call(handleRequestOptions, request);
+    (_g = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _g.call(handleRequestOptions, request);
     return;
   }
   readResponseCookies(request, response2);
@@ -1652,8 +1681,8 @@ init_esm_shims();
 async function requestIntegrityCheck(context, serviceWorker) {
   context.workerChannel.send("INTEGRITY_CHECK_REQUEST");
   const { payload: actualChecksum } = await context.events.once("INTEGRITY_CHECK_RESPONSE");
-  if (actualChecksum !== "02f4ad4a2797f85668baf196e553d929") {
-    throw new Error(`Currently active Service Worker (${actualChecksum}) is behind the latest published one (${"02f4ad4a2797f85668baf196e553d929"}).`);
+  if (actualChecksum !== "c114f472ae1dec55ef7db5cb550f815b") {
+    throw new Error(`Currently active Service Worker (${actualChecksum}) is behind the latest published one (${"c114f472ae1dec55ef7db5cb550f815b"}).`);
   }
   return serviceWorker;
 }
@@ -1687,7 +1716,7 @@ function createResponseListener(context) {
       return;
     }
     const response2 = new Response(responseJson.body || null, responseJson);
-    const isMockedResponse = response2.headers.get("x-powered-by") === "msw";
+    const isMockedResponse = response2.headers.get("x-powered-by") === "swap";
     if (isMockedResponse) {
       context.emitter.emit("response:mocked", response2, responseJson.requestId);
     } else {
@@ -1720,12 +1749,11 @@ var createStartHandler = (context) => {
         const missingWorkerMessage = (customOptions == null ? void 0 : customOptions.findWorker) ? devUtils.formatMessage(`Failed to locate the Service Worker registration using a custom "findWorker" predicate.
 
 Please ensure that the custom predicate properly locates the Service Worker registration at "%s".
-More details: https://mswjs.io/docs/api/setup-worker/start#findworker
 `, options.serviceWorker.url) : devUtils.formatMessage(`Failed to locate the Service Worker registration.
 
 This most likely means that the worker script URL "%s" cannot resolve against the actual public hostname (%s). This may happen if your application runs behind a proxy, or has a dynamic hostname.
 
-Please consider using a custom "serviceWorker.url" option to point to the actual worker script location, or a custom "findWorker" option to resolve the Service Worker registration manually. More details: https://mswjs.io/docs/api/setup-worker/start`, options.serviceWorker.url, location.host);
+Please consider using a custom "serviceWorker.url" option to point to the actual worker script location, or a custom "findWorker" option to resolve the Service Worker registration manually. `, options.serviceWorker.url, location.host);
         throw new Error(missingWorkerMessage);
       }
       context.worker = worker;
@@ -1742,10 +1770,9 @@ Please consider using a custom "serviceWorker.url" option to point to the actual
 
 The mocking is still enabled, but it's highly recommended that you update your Service Worker by running:
 
-$ npx msw init <PUBLIC_DIR>
+$ npx swap init <PUBLIC_DIR>
 
-This is necessary to ensure that the Service Worker is in sync with the library to guarantee its stability.
-If this message still persists after updating, please report an issue: https://github.com/open-draft/msw/issues      `);
+This is necessary to ensure that the Service Worker is in sync with the library to guarantee its stability.`);
       }
       context.keepAliveInterval = window.setInterval(() => context.workerChannel.send("KEEPALIVE_REQUEST"), 5e3);
       validateWorkerScope(registration, context.startOptions);
@@ -1819,14 +1846,14 @@ function resetHandlers(initialHandlers, ...nextHandlers) {
 init_esm_shims();
 var DEFAULT_START_OPTIONS = {
   serviceWorker: {
-    url: "/mockServiceWorker.js",
+    url: "/swapSW.js",
     options: null
   },
   quiet: false,
   waitUntilReady: true,
   onUnhandledRequest: "warn",
-  findWorker(scriptURL, mockServiceWorkerUrl) {
-    return scriptURL === mockServiceWorkerUrl;
+  findWorker(scriptURL, swapSWUrl) {
+    return scriptURL === swapSWUrl;
   }
 };
 function resolveStartOptions(initialOptions) {
@@ -1944,7 +1971,7 @@ function setupWorker(...requestHandlers) {
     if (Array.isArray(handler))
       throw new Error(devUtils.formatMessage('Failed to call "setupWorker" given an Array of request handlers (setupWorker([a, b])), expected to receive each handler individually: setupWorker(a, b).'));
   });
-  if (isNodeProcess3()) {
+  if (isNodeProcess2()) {
     throw new Error(devUtils.formatMessage("Failed to execute `setupWorker` in a non-browser environment. Consider using `setupServer` for Node.js environment instead."));
   }
   const emitter = new StrictEventEmitter();
@@ -2040,9 +2067,6 @@ function setupWorker(...requestHandlers) {
           console.log(`Declaration: ${callFrame}`);
         }
         console.log("Handler:", handler);
-        if (handler instanceof RestHandler) {
-          console.log("Match:", `https://mswjs.io/repl?path=${handler.info.path}`);
-        }
         console.groupEnd();
       });
     },

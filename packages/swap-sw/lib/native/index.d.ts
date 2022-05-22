@@ -1,4 +1,4 @@
-import { b as RequestHandler, i as RequestHandlerDefaultInfo, M as MockedRequest, c as DefaultBodyType, z as SetupServerApi } from '../glossary-4a305c8f.js';
+import { b as RequestHandler, i as RequestHandlerDefaultInfo, M as MockedRequest, c as DefaultBodyType, z as SetupServerApi } from '../glossary-d559be86.js';
 import 'type-fest';
 import '@mswjs/interceptors';
 import 'headers-polyfill';

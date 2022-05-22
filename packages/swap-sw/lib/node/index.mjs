@@ -261,7 +261,20 @@ import { interceptXMLHttpRequest } from "@mswjs/interceptors/lib/interceptors/XM
 init_esm_shims();
 init_polyfills_node();
 import { bold } from "chalk";
-import { isNodeProcess as isNodeProcess3 } from "is-node-process";
+
+// src/utils/internal/isNodeProcess.ts
+init_esm_shims();
+init_polyfills_node();
+function isNodeProcess() {
+  if (typeof global !== "object") {
+    return false;
+  }
+  if (Object.prototype.toString.call(global.process) === "[object process]" || navigator.product === "ReactNative") {
+    return true;
+  }
+}
+
+// src/node/createSetupServer.ts
 import { StrictEventEmitter } from "strict-event-emitter";
 import {
   createInterceptor
@@ -331,7 +344,7 @@ function createResponseComposition(responseOverrides, defaultTransformers = defa
   return async (...transformers) => {
     const initialResponse = Object.assign({}, defaultResponse, {
       headers: new Headers({
-        "x-powered-by": "msw"
+        "x-powered-by": "swap"
       })
     }, responseOverrides);
     const resolvedTransformers = [
@@ -414,7 +427,6 @@ function set(...args) {
 // src/context/delay.ts
 init_esm_shims();
 init_polyfills_node();
-import { isNodeProcess } from "is-node-process";
 var SET_TIMEOUT_MAX_ALLOWED_INT = 2147483647;
 var MIN_SERVER_RESPONSE_TIME = 100;
 var MAX_SERVER_RESPONSE_TIME = 400;
@@ -458,12 +470,11 @@ var delay = (durationOrMode) => {
 // src/context/fetch.ts
 init_esm_shims();
 init_polyfills_node();
-import { isNodeProcess as isNodeProcess2 } from "is-node-process";
 import { Headers as Headers2 } from "headers-polyfill";
-var useFetch = isNodeProcess2() ? __require("node-fetch") : window.fetch;
+var useFetch = isNodeProcess() ? __require("node-fetch") : window.fetch;
 var augmentRequestInit = (requestInit) => {
   const headers = new Headers2(requestInit.headers);
-  headers.set("x-msw-bypass", "true");
+  headers.set("x-swap-bypass", "true");
   return __spreadProps(__spreadValues({}, requestInit), {
     headers: headers.all()
   });
@@ -798,7 +809,7 @@ var getResponse = async (request, handlers, resolutionContext) => {
 init_esm_shims();
 init_polyfills_node();
 var import_outvariant = __toESM(require_lib());
-var LIBRARY_PREFIX = "[MSW]";
+var LIBRARY_PREFIX = "[SWAP]";
 function formatMessage(message, ...positionals) {
   const interpolatedMessage = (0, import_outvariant.format)(message, ...positionals);
   return `${LIBRARY_PREFIX} ${interpolatedMessage}`;
@@ -1017,17 +1028,6 @@ var data = (payload) => {
   return (res) => {
     const prevBody = jsonParse(res.body) || {};
     const nextBody = mergeRight(prevBody, { data: payload });
-    return json(nextBody)(res);
-  };
-};
-
-// src/context/extensions.ts
-init_esm_shims();
-init_polyfills_node();
-var extensions = (payload) => {
-  return (res) => {
-    const prevBody = jsonParse(res.body) || {};
-    const nextBody = mergeRight(prevBody, { extensions: payload });
     return json(nextBody)(res);
   };
 };
@@ -1253,6 +1253,17 @@ var RestHandler = class extends RequestHandler {
 init_esm_shims();
 init_polyfills_node();
 
+// src/context/extensions.ts
+init_esm_shims();
+init_polyfills_node();
+var extensions = (payload) => {
+  return (res) => {
+    const prevBody = jsonParse(res.body) || {};
+    const nextBody = mergeRight(prevBody, { extensions: payload });
+    return json(nextBody)(res);
+  };
+};
+
 // src/utils/internal/tryCatch.ts
 init_esm_shims();
 init_polyfills_node();
@@ -1319,7 +1330,8 @@ var GraphQLHandler = class extends RequestHandler {
       const publicUrl = getPublicUrlFromRequest(request);
       devUtils.warn(`Failed to intercept a GraphQL request at "${request.method} ${publicUrl}": anonymous GraphQL operations are not supported.
 
-Consider naming this operation or using "graphql.operation" request handler to intercept GraphQL requests regardless of their operation name/type. Read more: https://mswjs.io/docs/api/graphql/operation      `);
+Consider naming this operation or using "graphql.operation" request handler to intercept GraphQL requests regardless of their operation name/type.
+      `);
       return false;
     }
     const hasMatchingUrl = matchRequestUrl(request.url, this.endpoint);
@@ -1418,7 +1430,7 @@ function onUnhandledRequest(request, handlers, strategy = "warn") {
       `  \u2022 ${requestHeader}`,
       handlerSuggestion,
       `If you still wish to intercept this unhandled request, please create a request handler for it.
-Read more: https://mswjs.io/docs/getting-started/mocks`
+`
     ].filter(Boolean);
     return messageTemplate.join("\n\n");
   }
@@ -1458,13 +1470,35 @@ function readResponseCookies(request, response2) {
   store2.persist();
 }
 
+// src/utils/matching/bypassUrl.ts
+init_esm_shims();
+init_polyfills_node();
+var isBypass = function(requestURL) {
+  const bypassRegExp = [
+    /^(http|https):\/\/([\w\W]+)\/sockjs-node\/info/gi,
+    /^(http|https):\/\/([\w\W]+)\/([\w\W]+).hot-update/gi
+  ];
+  return bypassRegExp.some(function(item) {
+    if (requestURL.match(item)) {
+      return true;
+    }
+  });
+};
+
 // src/utils/handleRequest.ts
 async function handleRequest(request, handlers, options, emitter, handleRequestOptions) {
-  var _a, _b, _c, _d;
+  var _a, _b, _c, _d, _e, _f, _g;
   emitter.emit("request:start", request);
-  if (request.headers.get("x-msw-bypass") === "true") {
+  if (request.headers.get("x-swap-bypass") === "true" || isBypass(request.url.href)) {
     emitter.emit("request:end", request);
     (_a = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _a.call(handleRequestOptions, request);
+    return;
+  }
+  if (options.bypassMode === "api" && ((_b = request.headers) == null ? void 0 : _b.get("x-swap-jsbridge")) !== "true" || options.bypassMode === "jsbridge" && ((_c = request.headers) == null ? void 0 : _c.get("x-swap-jsbridge")) === "true") {
+    onUnhandledRequest(request, handlers, options.onUnhandledRequest);
+    emitter.emit("request:unhandled", request);
+    emitter.emit("request:end", request);
+    (_d = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _d.call(handleRequestOptions, request);
     return;
   }
   const [lookupError, lookupResult] = await until(() => {
@@ -1479,7 +1513,7 @@ async function handleRequest(request, handlers, options, emitter, handleRequestO
     onUnhandledRequest(request, handlers, options.onUnhandledRequest);
     emitter.emit("request:unhandled", request);
     emitter.emit("request:end", request);
-    (_b = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _b.call(handleRequestOptions, request);
+    (_e = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _e.call(handleRequestOptions, request);
     return;
   }
   if (!response2) {
@@ -1488,12 +1522,12 @@ async function handleRequest(request, handlers, options, emitter, handleRequestO
   \u2022 %s
     %s`, response2, handler.info.header, handler.info.callFrame);
     emitter.emit("request:end", request);
-    (_c = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _c.call(handleRequestOptions, request);
+    (_f = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _f.call(handleRequestOptions, request);
     return;
   }
   if (response2.passthrough) {
     emitter.emit("request:end", request);
-    (_d = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _d.call(handleRequestOptions, request);
+    (_g = handleRequestOptions == null ? void 0 : handleRequestOptions.onPassthroughResponse) == null ? void 0 : _g.call(handleRequestOptions, request);
     return;
   }
   readResponseCookies(request, response2);
@@ -1541,7 +1575,7 @@ function createSetupServer(...interceptors) {
         throw new Error(devUtils.formatMessage('Failed to call "setupServer" given an Array of request handlers (setupServer([a, b])), expected to receive each handler individually: setupServer(a, b).'));
     });
     let currentHandlers = [...requestHandlers];
-    if (!isNodeProcess3()) {
+    if (!isNodeProcess()) {
       throw new Error(devUtils.formatMessage("Failed to execute `setupServer` in the environment that is not Node.js (i.e. a browser). Consider using `setupWorker` instead."));
     }
     let resolvedOptions = {};
@@ -1565,7 +1599,7 @@ function createSetupServer(...interceptors) {
       if (!request.id) {
         return;
       }
-      if (response2.headers.get("x-powered-by") === "msw") {
+      if (response2.headers.get("x-powered-by") === "swap") {
         emitter.emit("response:mocked", response2, request.id);
       } else {
         emitter.emit("response:bypass", response2, request.id);

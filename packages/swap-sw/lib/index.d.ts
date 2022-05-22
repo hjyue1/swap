@@ -1,5 +1,5 @@
-import { R as ResponseTransformer, s as status, a as set, d as delay, f as fetch, b as RequestHandler, S as SetupWorkerApi, D as DefaultContext, c as DefaultBodyType, M as MockedRequest, e as ResponseResolver, g as ResponseResolutionContext, h as SerializedResponse, i as RequestHandlerDefaultInfo, j as MockedResponse, k as ResponseLookupResult, l as SharedOptions, m as ServerLifecycleEventsMap } from './glossary-4a305c8f.js';
-export { A as AsyncResponseResolverReturnType, c as DefaultBodyType, u as DefaultRequestMultipartBody, y as DelayMode, M as MockedRequest, j as MockedResponse, b as RequestHandler, v as ResponseComposition, w as ResponseCompositionOptions, x as ResponseFunction, e as ResponseResolver, t as ResponseResolverReturnType, R as ResponseTransformer, S as SetupWorkerApi, l as SharedOptions, q as StartOptions, o as createResponseComposition, p as defaultContext, n as defaultResponse, r as response } from './glossary-4a305c8f.js';
+import { R as ResponseTransformer, s as status, a as set, d as delay, f as fetch, b as RequestHandler, S as SetupWorkerApi, D as DefaultContext, c as DefaultBodyType, M as MockedRequest, e as ResponseResolver, g as ResponseResolutionContext, h as SerializedResponse, i as RequestHandlerDefaultInfo, j as MockedResponse, k as ResponseLookupResult, l as SharedOptions, m as ServerLifecycleEventsMap } from './glossary-d559be86.js';
+export { A as AsyncResponseResolverReturnType, c as DefaultBodyType, u as DefaultRequestMultipartBody, y as DelayMode, M as MockedRequest, j as MockedResponse, b as RequestHandler, v as ResponseComposition, w as ResponseCompositionOptions, x as ResponseFunction, e as ResponseResolver, t as ResponseResolverReturnType, R as ResponseTransformer, S as SetupWorkerApi, l as SharedOptions, q as StartOptions, o as createResponseComposition, p as defaultContext, n as defaultResponse, r as response } from './glossary-d559be86.js';
 import * as cookieUtils from 'cookie';
 import { GraphQLError, OperationTypeNode, DocumentNode } from 'graphql';
 import { StrictEventEmitter } from 'strict-event-emitter';
@@ -13,42 +13,11 @@ import 'headers-polyfill';
  */
 declare const cookie: (name: string, value: string, options?: cookieUtils.CookieSerializeOptions | undefined) => ResponseTransformer;
 
-/**
- * Sets a raw response body. Does not append any `Content-Type` headers.
- * @example
- * res(ctx.body('Successful response'))
- * res(ctx.body(JSON.stringify({ key: 'value' })))
- * @see {@link https://mswjs.io/docs/api/context/body `ctx.body()`}
- */
 declare const body: <BodyType extends string | Blob | BufferSource | ReadableStream<any> | FormData>(value: BodyType) => ResponseTransformer<BodyType, any>;
 
-declare type Fn = (...arg: any[]) => any;
-declare type RequiredDeep<Type, U extends Record<string, unknown> | Fn | undefined = undefined> = Type extends Fn ? Type : Type extends Record<string, any> ? {
-    [Key in keyof Type]-?: NonNullable<Type[Key]> extends NonNullable<U> ? NonNullable<Type[Key]> : RequiredDeep<NonNullable<Type[Key]>, U>;
-} : Type;
-declare type GraphQLPayloadContext<QueryType extends Record<string, unknown>> = (payload: QueryType) => ResponseTransformer;
+declare type DataContext<T> = (payload: T) => ResponseTransformer;
+declare const data: DataContext<Record<string, unknown>>;
 
-/**
- * Sets a given payload as a GraphQL response body.
- * @example
- * res(ctx.data({ user: { firstName: 'John' }}))
- * @see {@link https://mswjs.io/docs/api/context/data `ctx.data()`}
- */
-declare const data: GraphQLPayloadContext<Record<string, unknown>>;
-
-/**
- * Sets the GraphQL extensions on a given response.
- * @example
- * res(ctx.extensions({ tracing: { version: 1 }}))
- * @see {@link https://mswjs.io/docs/api/context/extensions `ctx.extensions()`}
- */
-declare const extensions: GraphQLPayloadContext<Record<string, unknown>>;
-
-/**
- * Sets a given list of GraphQL errors on the mocked response.
- * @example res(ctx.errors([{ message: 'Unauthorized' }]))
- * @see {@link https://mswjs.io/docs/api/context/errors}
- */
 declare const errors: <ErrorsType extends readonly Partial<GraphQLError>[] | null | undefined>(errorsList: ErrorsType) => ResponseTransformer<string>;
 
 declare type Path = string | RegExp;
@@ -64,33 +33,16 @@ interface Match {
  */
 declare function matchRequestUrl(url: URL, path: Path, baseUrl?: string): Match;
 
-/**
- * Sets the given value as the JSON body of the response.
- * Appends a `Content-Type: application/json` header on the
- * mocked response.
- * @example
- * res(ctx.json('Some string'))
- * res(ctx.json({ key: 'value' }))
- * res(ctx.json([1, '2', false, { ok: true }]))
- * @see {@link https://mswjs.io/docs/api/context/json `ctx.json()`}
- */
+declare type Fn = (...arg: any[]) => any;
+declare type RequiredDeep<Type, U extends Record<string, unknown> | Fn | undefined = undefined> = Type extends Fn ? Type : Type extends Record<string, any> ? {
+    [Key in keyof Type]-?: NonNullable<Type[Key]> extends NonNullable<U> ? NonNullable<Type[Key]> : RequiredDeep<NonNullable<Type[Key]>, U>;
+} : Type;
+declare type GraphQLPayloadContext<QueryType extends Record<string, unknown>> = (payload: QueryType) => ResponseTransformer;
+
 declare const json: <BodyTypeJSON>(body: BodyTypeJSON) => ResponseTransformer<BodyTypeJSON, any>;
 
-/**
- * Sets a textual response body. Appends a `Content-Type: text/plain`
- * header on the mocked response.
- * @example res(ctx.text('Successful response'))
- * @see {@link https://mswjs.io/docs/api/context/text `ctx.text()`}
- */
 declare const text: <BodyType extends string>(body: BodyType) => ResponseTransformer<BodyType, any>;
 
-/**
- * Sets an XML response body. Appends a `Content-Type: text/xml` header
- * on the mocked response.
- * @example
- * res(ctx.xml('<node key="value">Content</node>'))
- * @see {@link https://mswjs.io/docs/api/context/xml `ctx.xml()`}
- */
 declare const xml: <BodyType extends string>(body: BodyType) => ResponseTransformer<BodyType, any>;
 
 declare const index_status: typeof status;
@@ -98,7 +50,6 @@ declare const index_set: typeof set;
 declare const index_cookie: typeof cookie;
 declare const index_body: typeof body;
 declare const index_data: typeof data;
-declare const index_extensions: typeof extensions;
 declare const index_delay: typeof delay;
 declare const index_errors: typeof errors;
 declare const index_fetch: typeof fetch;
@@ -112,7 +63,6 @@ declare namespace index {
     index_cookie as cookie,
     index_body as body,
     index_data as data,
-    index_extensions as extensions,
     index_delay as delay,
     index_errors as errors,
     index_fetch as fetch,
@@ -126,7 +76,6 @@ declare namespace index {
  * Creates a new mock Service Worker registration
  * with the given request handlers.
  * @param {RequestHandler[]} requestHandlers List of request handlers
- * @see {@link https://mswjs.io/docs/api/setup-worker `setupWorker`}
  */
 declare function setupWorker(...requestHandlers: RequestHandler[]): SetupWorkerApi;
 
@@ -244,7 +193,6 @@ declare const standardGraphQLHandlers: {
      * graphql.operation((req, res, ctx) => {
      *   return res(ctx.data({ name: 'John' }))
      * })
-     * @see {@link https://mswjs.io/docs/api/graphql/operation `graphql.operation()`}
      */
     operation: <Query extends Record<string, any>, Variables extends GraphQLVariables = GraphQLVariables>(resolver: ResponseResolver<GraphQLRequest<Variables>, GraphQLContext<Query>, any>) => GraphQLHandler<GraphQLRequest<Variables>>;
     /**
@@ -253,7 +201,6 @@ declare const standardGraphQLHandlers: {
      * graphql.query('GetUser', (req, res, ctx) => {
      *   return res(ctx.data({ user: { name: 'John' } }))
      * })
-     * @see {@link https://mswjs.io/docs/api/graphql/query `graphql.query()`}
      */
     query: <Query_1 extends Record<string, any>, Variables_1 extends GraphQLVariables = GraphQLVariables>(operationName: GraphQLHandlerNameSelector | TypedDocumentNode<Query_1, Variables_1>, resolver: ResponseResolver<GraphQLRequest<Variables_1>, GraphQLContext<Query_1>, any>) => GraphQLHandler<GraphQLRequest<Variables_1>>;
     /**
@@ -262,7 +209,6 @@ declare const standardGraphQLHandlers: {
      * graphql.mutation('SavePost', (req, res, ctx) => {
      *   return res(ctx.data({ post: { id: 'abc-123' } }))
      * })
-     * @see {@link https://mswjs.io/docs/api/graphql/mutation `graphql.mutation()`}
      */
     mutation: <Query_1 extends Record<string, any>, Variables_1 extends GraphQLVariables = GraphQLVariables>(operationName: GraphQLHandlerNameSelector | TypedDocumentNode<Query_1, Variables_1>, resolver: ResponseResolver<GraphQLRequest<Variables_1>, GraphQLContext<Query_1>, any>) => GraphQLHandler<GraphQLRequest<Variables_1>>;
 };
@@ -275,7 +221,6 @@ declare const graphql: {
      * graphql.operation((req, res, ctx) => {
      *   return res(ctx.data({ name: 'John' }))
      * })
-     * @see {@link https://mswjs.io/docs/api/graphql/operation `graphql.operation()`}
      */
     operation: <Query extends Record<string, any>, Variables extends GraphQLVariables = GraphQLVariables>(resolver: ResponseResolver<GraphQLRequest<Variables>, GraphQLContext<Query>, any>) => GraphQLHandler<GraphQLRequest<Variables>>;
     /**
@@ -284,7 +229,6 @@ declare const graphql: {
      * graphql.query('GetUser', (req, res, ctx) => {
      *   return res(ctx.data({ user: { name: 'John' } }))
      * })
-     * @see {@link https://mswjs.io/docs/api/graphql/query `graphql.query()`}
      */
     query: <Query_1 extends Record<string, any>, Variables_1 extends GraphQLVariables = GraphQLVariables>(operationName: GraphQLHandlerNameSelector | TypedDocumentNode<Query_1, Variables_1>, resolver: ResponseResolver<GraphQLRequest<Variables_1>, GraphQLContext<Query_1>, any>) => GraphQLHandler<GraphQLRequest<Variables_1>>;
     /**
@@ -293,7 +237,6 @@ declare const graphql: {
      * graphql.mutation('SavePost', (req, res, ctx) => {
      *   return res(ctx.data({ post: { id: 'abc-123' } }))
      * })
-     * @see {@link https://mswjs.io/docs/api/graphql/mutation `graphql.mutation()`}
      */
     mutation: <Query_1 extends Record<string, any>, Variables_1 extends GraphQLVariables = GraphQLVariables>(operationName: GraphQLHandlerNameSelector | TypedDocumentNode<Query_1, Variables_1>, resolver: ResponseResolver<GraphQLRequest<Variables_1>, GraphQLContext<Query_1>, any>) => GraphQLHandler<GraphQLRequest<Variables_1>>;
 };

@@ -75,7 +75,7 @@ export const getWorkerInstance = async (
         devUtils.formatMessage(`\
 Failed to register a Service Worker for scope ('${scopeUrl.href}') with script ('${absoluteWorkerUrl}'): Service Worker script does not exist at the given path.
 
-Did you forget to run "npx msw init <PUBLIC_DIR>"?`),
+Did you forget to run "npx swap init <PUBLIC_DIR>"?`),
       )
     }
 

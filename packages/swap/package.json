@@ -1,8 +1,8 @@
 {
   "name": "swap",
   "version": "1.0.0",
-  "description": "> TODO: description",
-  "author": "liudong <liudong.liudong@alibaba-inc.com>",
+  "description": "",
+  "author": "hjyue1 <hjyue1@163.com>",
   "homepage": "",
   "license": "ISC",
   "main": "lib/umd/index.js",

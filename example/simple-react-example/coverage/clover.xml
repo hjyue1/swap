@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1618819061850" clover="3.2.0">
+  <project timestamp="1618819061851" name="All files">
+    <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3" elements="13" coveredelements="13" complexity="0" loc="10" ncloc="10" packages="1" files="1" classes="1"/>
+    <file name="App.js" path="/Users/rocketliu/Desktop/work/git/simple-react-example/src/App.js">
+      <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+      <line num="7" count="6" type="stmt"/>
+      <line num="8" count="6" type="stmt"/>
+      <line num="10" count="6" type="stmt"/>
+      <line num="11" count="2" type="stmt"/>
+      <line num="12" count="2" type="stmt"/>
+      <line num="13" count="2" type="stmt"/>
+      <line num="14" count="2" type="stmt"/>
+      <line num="15" count="2" type="stmt"/>
+      <line num="17" count="2" type="stmt"/>
+      <line num="20" count="6" type="stmt"/>
+    </file>
+  </project>
+</coverage>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios';
-import { swapCall } from '@tencent/swap';
+import { swapCall } from 'swap';
 
 function App() {
   const [code, setCode] = useState(0);

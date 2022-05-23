@@ -13,8 +13,8 @@ var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
 
 var name = "swap";
 var version = "1.0.0";
-var description = "> TODO: description";
-var author = "liudong <liudong.liudong@alibaba-inc.com>";
+var description = "";
+var author = "hjyue1 <hjyue1@163.com>";
 var homepage = "";
 var license = "ISC";
 var main = "lib/umd/index.js";
@@ -125,7 +125,7 @@ var packageJson = {
 	devDependencies: devDependencies
 };
 
-var __dirname$1 = '/swap-mok\packages\swap\config';
+var __dirname$1 = '/Users/liudong/Desktop/github/swap/packages/swap/config';
 
 const SERVICE_WORKER_SOURCE_PATH = path__default["default"].resolve(
   __dirname$1,

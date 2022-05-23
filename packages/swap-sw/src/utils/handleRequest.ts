@@ -75,8 +75,8 @@ export async function handleRequest<
     (options.bypassMode === 'jsbridge' &&
       request.headers?.get('x-swap-jsbridge') === 'true')
   ) {
-    onUnhandledRequest(request, handlers, options.onUnhandledRequest)
-    emitter.emit('request:unhandled', request)
+    // onUnhandledRequest(request, handlers, options.onUnhandledRequest)
+    // emitter.emit('request:unhandled', request)
     emitter.emit('request:end', request)
     handleRequestOptions?.onPassthroughResponse?.(request)
     return

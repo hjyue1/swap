@@ -50,7 +50,7 @@ tnpm install @tencent/swap
   - 如果项目有使用webpack `4.40.0以上版本`
     ```js
     // webpack.config.js
-    const SwapWebpackPlugin = require('@tencent/swap/webpackPlugin');
+    const SwapWebpackPlugin = require('swap/webpackPlugin');
     ...
     module.exports = {
       ...
@@ -77,7 +77,7 @@ import './index.css';
 import App from './App';
 // 引入swap
 if (process.env.NODE_ENV === 'development') {
-  const swap = require('@tencent/swap')
+  const swap = require('swap')
   const mockData = require('../mocker')
   swap.swapInit({
     mockData

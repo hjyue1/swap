@@ -1,6 +1,8 @@
 {
   "packages": [
-    "packages/*"
+    "packages/rocket-swap",
+    "packages/@swap/jsbridge",
+    "packages/@swap/sw"
   ],
-  "version": "1.0.2"
+  "version": "1.0.0"
 }

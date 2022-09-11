@@ -1,9 +1,9 @@
 import { g as getStore, p as patchSetStore, s as setStore } from './jsbridge-deps.js';
 export { a as swapCall, b as swapCallWithPromise } from './jsbridge-deps.js';
-import { rest, setupWorker } from 'swap-sw';
-import { setupServer } from 'swap-sw/node';
+import { rest, setupWorker } from '@swap/sw';
+import { setupServer } from '@swap/sw/node';
 export { waitFor } from './waitFor.js';
-import 'swap-jsbridge';
+import '@swap/jsbridge';
 import 'axios';
 
 /**

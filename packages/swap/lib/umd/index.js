@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('swap-sw'), require('swap-sw/node'), require('swap-jsbridge'), require('axios')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'swap-sw', 'swap-sw/node', 'swap-jsbridge', 'axios'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.swapSW = {}, global["swap-sw"], global["swap-sw"], global["swap-jsbridge"], global.axios));
-})(this, (function (exports, swapSw, node, swapJsbridge, axios) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@swap/sw'), require('@swap/sw/node'), require('@swap/jsbridge'), require('axios')) :
+  typeof define === 'function' && define.amd ? define(['exports', '@swap/sw', '@swap/sw/node', '@swap/jsbridge', 'axios'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.swapSW = {}, global["@swap/sw"], global["@swap/sw"], global["@swap/jsbridge"], global.axios));
+})(this, (function (exports, sw, node, jsbridge, axios) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -75,15 +75,15 @@
       const handlers = [];
       Object.entries(mockData).forEach(([key, mockHandle]) => {
           const { method, url } = analysisKey(key);
-          if (!swapSw.rest[method]) {
+          if (!sw.rest[method]) {
               console.error(`${key}无效字段`);
               return;
           }
           if (typeof mockHandle === 'function') {
-              handlers.push(swapSw.rest[method](url, mockHandle));
+              handlers.push(sw.rest[method](url, mockHandle));
           }
           else {
-              handlers.push(swapSw.rest[method](url, (req, res, ctx) => res(ctx.status(200), ctx.json(mockHandle))));
+              handlers.push(sw.rest[method](url, (req, res, ctx) => res(ctx.status(200), ctx.json(mockHandle))));
           }
       });
       return handlers;
@@ -100,20 +100,20 @@
       if (getStore('mode') === 'JEST')
           return;
       const handlers = transform(getStore('mockData'));
-      const sw = swapSw.setupWorker(...handlers);
+      const sw$1 = sw.setupWorker(...handlers);
       const { workerOpt, bypassMode, isOnline, baseURL } = getStore();
-      sw.start(Object.assign({ bypassMode,
+      sw$1.start(Object.assign({ bypassMode,
           isOnline,
           baseURL }, workerOpt));
   };
   const workerStop = function () {
-      swapSw.setupWorker().stop();
+      sw.setupWorker().stop();
   };
   const workerRestoreHandlers = function () {
-      swapSw.setupWorker().restoreHandlers();
+      sw.setupWorker().restoreHandlers();
   };
   const workerResetHandlers = function () {
-      swapSw.setupWorker().resetHandlers();
+      sw.setupWorker().resetHandlers();
   };
 
   /**
@@ -221,8 +221,8 @@
           });
       };
   };
-  const swapCall = wrapperCall(swapJsbridge.call);
-  const swapCallWithPromise = wrapperCall(swapJsbridge.callWithPromise);
+  const swapCall = wrapperCall(jsbridge.call);
+  const swapCallWithPromise = wrapperCall(jsbridge.callWithPromise);
 
   const scheduler = typeof setImmediate === 'function' ? setImmediate : setTimeout;
   const waitFor = function () {

@@ -11,7 +11,7 @@ var webpack__default = /*#__PURE__*/_interopDefaultLegacy(webpack);
 var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
 var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
 
-var name = "swap";
+var name = "rocket-swap";
 var version = "1.0.0";
 var description = "";
 var author = "hjyue1 <hjyue1@163.com>";
@@ -39,8 +39,8 @@ var scripts = {
 	prepublishOnly: "yarn build"
 };
 var dependencies = {
-	"swap-jsbridge": "^1.0.0",
-	"swap-sw": "^1.0.0",
+	"@swap/jsbridge": "^1.0.0",
+	"@swap/sw": "^1.0.0",
 	tslib: "^2.4.0"
 };
 var devDependencies = {
@@ -130,7 +130,7 @@ var __dirname$1 = '/Users/liudong/Desktop/github/swap/packages/swap/config';
 const SERVICE_WORKER_SOURCE_PATH = path__default["default"].resolve(
   __dirname$1,
   '../',
-  'node_modules/swap-sw/lib',
+  'node_modules/@swap/sw/lib',
   'swapSW.js',
 );
 

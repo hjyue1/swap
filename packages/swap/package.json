@@ -1,5 +1,5 @@
 {
-  "name": "swap",
+  "name": "rocket-swap",
   "version": "1.0.0",
   "description": "",
   "author": "hjyue1 <hjyue1@163.com>",
@@ -27,8 +27,8 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "swap-jsbridge": "^1.0.0",
-    "swap-sw": "^1.0.0",
+    "@swap/jsbridge": "^1.0.0",
+    "@swap/sw": "^1.0.0",
     "tslib": "^2.4.0"
   },
   "devDependencies": {

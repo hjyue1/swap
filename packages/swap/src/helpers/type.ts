@@ -1,5 +1,5 @@
 
-import { StartOptions } from 'swap-sw/lib/types/setupWorker/glossary';
+import { StartOptions } from '@swap/sw/lib/types/setupWorker/glossary';
 
 export {
   AxiosResponse,
@@ -40,7 +40,7 @@ export interface Store {
   },
   // 在jest模式下，swap的监听实例
   swapJestServer: any,
-  // 传给swap-sw的参数
+  // 传给@swap/sw的参数
   workerOpt?: StartOptions
 }
 

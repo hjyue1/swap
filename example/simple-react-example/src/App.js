@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios';
-import { swapCall } from 'swap';
+import { swapCall } from 'rocket-swap';
 
 function App() {
   const [code, setCode] = useState(0);

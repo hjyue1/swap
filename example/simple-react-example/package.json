@@ -9,7 +9,7 @@
     "@babel/preset-react": "^7.12.7",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.2",
     "@svgr/webpack": "5.4.0",
-    "swap": "^1.0.0",
+    "rocket-swap": "^1.0.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -184,7 +184,6 @@
   "devDependencies": {
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.1",
     "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.5",
     "identity-obj-proxy": "^3.0.0",
     "jest-html-reporters": "^2.1.4",
     "webpack-cli": "^4.2.0"

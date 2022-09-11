@@ -2,7 +2,7 @@
 
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
 //   .BundleAnalyzerPlugin;
-const SwapWebpackPlugin = require('swap/webpackPlugin');
+const SwapWebpackPlugin = require('rocket-swap/webpackPlugin');
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');

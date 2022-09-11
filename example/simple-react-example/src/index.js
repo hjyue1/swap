@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 if (process.env.NODE_ENV === 'development') {
-  const swap = require('swap')
+  const swap = require('rocket-swap')
   const mockData = require('../mocker')
   swap.swapInit({
     isMock: true,

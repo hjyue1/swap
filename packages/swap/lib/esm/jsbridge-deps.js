@@ -1,4 +1,4 @@
-import { call, callWithPromise } from 'swap-jsbridge';
+import { call, callWithPromise } from '@swap/jsbridge';
 import axios from 'axios';
 
 const mode = 'MOCK';

@@ -6,7 +6,7 @@ module.exports = {
     return res(
       ctx.status(200),
       ctx.json({
-        code: '202',
+        code: '203',
       })
     );
   },

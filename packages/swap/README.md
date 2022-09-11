@@ -50,7 +50,7 @@ tnpm install @tencent/swap
   - 如果项目有使用webpack `4.40.0以上版本`
     ```js
     // webpack.config.js
-    const SwapWebpackPlugin = require('swap/webpackPlugin');
+    const SwapWebpackPlugin = require('rocket-swap/webpackPlugin');
     ...
     module.exports = {
       ...

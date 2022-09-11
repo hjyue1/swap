@@ -1,5 +1,5 @@
 import { mockDataType } from './type';
-import { rest } from 'swap-sw';
+import { rest } from '@swap/sw';
 
 type handlersType = Array<any>
 

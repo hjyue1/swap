@@ -1,4 +1,4 @@
-import { call, callWithPromise } from 'swap-jsbridge';
+import { call, callWithPromise } from '@swap/jsbridge';
 import { UnKnowObjParam } from './helpers/type';
 import { handlerRequest } from './helpers/utils';
 import { getStore } from './core/store';

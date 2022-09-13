@@ -4,7 +4,7 @@ const packageJson = require('../package.json');
 const SERVICE_WORKER_SOURCE_PATH = path.resolve(
   __dirname,
   '../',
-  'node_modules/@swap/sw/lib',
+  'node_modules/rocket-swap-sw/lib',
   'swapSW.js',
 )
 

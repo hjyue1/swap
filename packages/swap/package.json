@@ -27,8 +27,8 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@swap/jsbridge": "^1.0.3",
-    "@swap/sw": "^1.0.3",
+    "rocket-swap-jsbridge": "^1.0.3",
+    "rocket-swap-sw": "^1.0.3",
     "tslib": "^2.4.0"
   },
   "devDependencies": {
@@ -94,5 +94,6 @@
     "typescript": "^4.0.2",
     "webpack": "^4.44.2",
     "webpack-sources": "^2.2.0"
-  }
+  },
+  "gitHead": "66754ae7f448dbacfe0087e2b9e5dccdabb498b5"
 }

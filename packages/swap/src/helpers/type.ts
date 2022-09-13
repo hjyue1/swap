@@ -1,5 +1,5 @@
 
-import { StartOptions } from '@swap/sw/lib/types/setupWorker/glossary';
+import { StartOptions } from 'rocket-swap-sw/lib/types/setupWorker/glossary';
 
 export {
   AxiosResponse,

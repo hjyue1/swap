@@ -1,16 +1,16 @@
 <p align="center">
-  <h1>@swap/jsbridge</h1>
+  <h1>rocket-swap-jsbridge</h1>
 </p>
 
 ## 如何使用
 安装依赖包
 ```bash
-tnpm install @swap/jsbridge
+tnpm install rocket-swap-jsbridge
 ```
 接下来
 ```js
 // 1. Import mocking utils.
-import { call, callWithPromise } from '@swap/jsbridge';
+import { call, callWithPromise } from 'rocket-swap-jsbridge';
 // 2. call
 call('jsbridge://weseeLive/getLiveInfo', {})
 ```

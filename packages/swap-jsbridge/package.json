@@ -1,5 +1,5 @@
 {
-  "name": "@swap/jsbridge",
+  "name": "rocket-swap-jsbridge",
   "version": "1.0.3",
   "description": "",
   "author": "hjyue1 <hjyue1@163.com>",
@@ -45,5 +45,6 @@
   },
   "dependencies": {
     "tslib": "^2.4.0"
-  }
+  },
+  "gitHead": "66754ae7f448dbacfe0087e2b9e5dccdabb498b5"
 }

@@ -16,9 +16,9 @@ const {
 } = require('./config/constants');
 
 const varGlobals = {
-  '@swap/sw': '@swap/sw',
-  '@swap/sw/node': '@swap/sw',
-  '@swap/jsbridge': '@swap/jsbridge',
+  'rocket-swap-sw': 'rocket-swap-sw',
+  'rocket-swap-sw/node': 'rocket-swap-sw',
+  'rocket-swap-jsbridge': 'rocket-swap-jsbridge',
   fs: 'fs',
   path: 'path',
   webpack: 'webpack',
@@ -26,9 +26,9 @@ const varGlobals = {
   axios: 'axios',
 };
 const external = [
-  '@swap/sw',
-  '@swap/sw/node',
-  '@swap/jsbridge',
+  'rocket-swap-sw',
+  'rocket-swap-sw/node',
+  'rocket-swap-jsbridge',
   'fs',
   'path',
   'webpack',

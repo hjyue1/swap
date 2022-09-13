@@ -1,4 +1,4 @@
-import { setupWorker } from '@swap/sw';
+import { setupWorker } from 'rocket-swap-sw';
 import { transform } from '../../helpers/json-transform';
 import { getStore } from '../../core/store';
 

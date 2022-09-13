@@ -1,6 +1,6 @@
 import { setStore, getStore, patchSetStore } from '../../core/store';
 import { transform } from '../../helpers/json-transform';
-import { setupServer } from '@swap/sw/node';
+import { setupServer } from 'rocket-swap-sw/node';
 
 /**
 * @description 环境变量

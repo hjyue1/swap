@@ -11,7 +11,7 @@
 
 <script>
 import axios from "axios";
-import { swapCallWithPromise } from "@tencent/swap";
+import { swapCallWithPromise } from "rocket-swap";
 
 export default {
   name: "App",
@@ -52,7 +52,7 @@ export default {
 import Vue from "vue";
 import { mount } from "@vue/test-utils";
 import App from "@/App.vue";
-import { swapJestListen, waitFor } from "@tencent/swap";
+import { swapJestListen, waitFor } from "rocket-swap";
 
 swapJestListen();
 

@@ -43,7 +43,7 @@
 
 ##### 1.安装依赖包
 ```bash
-tnpm install @tencent/swap
+tnpm install rocket-swap
 ```
 
 ##### 2.根据项目构建方案

@@ -3,7 +3,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 import App from './App';
-import { swapJestListen, waitFor } from '@tencent/swap';
+import { swapJestListen, waitFor } from 'rocket-swap';
 swapJestListen();
 
 const waitForComponentToPaint = async (wrapper) => {

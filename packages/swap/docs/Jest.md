@@ -15,7 +15,7 @@
 
     ```js
     // jest.setup.js
-    import { swapJestInit } from '@tencent/swap';
+    import { swapJestInit } from 'rocket-swap';
 
     const mockData = {
       ['POST /post']: {
@@ -39,7 +39,7 @@
 
     ```js
     // jest.setup.js
-    import { swapJestInit } from '@tencent/swap';
+    import { swapJestInit } from 'rocket-swap';
 
     const mockData = {
       ['POST /post']: {
@@ -53,7 +53,7 @@
 
     ```js
     ...
-    import { swapJestListen } from "@tencent/swap";
+    import { swapJestListen } from "rocket-swap";
 
     swapJestListen()
 

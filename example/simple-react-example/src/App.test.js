@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import App from './App';
-import { swapJestListen } from '@tencent/swap';
+import { swapJestListen } from 'rocket-swap';
 swapJestListen()
 
 test('renders learn react link', async () => {

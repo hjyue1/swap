@@ -5,7 +5,7 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import axios from 'axios'
-import { swapCall } from '@tencent/swap'
+import { swapCall } from 'rocket-swap'
 
 function App() {
   const [code, setCode] = useState(0)
@@ -44,7 +44,7 @@ export default App;
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import App from './App';
-import { swapJestListen } from "@tencent/swap";
+import { swapJestListen } from "rocket-swap";
 swapJestListen()
 
 test('renders learn react link', async () => {

@@ -1,16 +1,16 @@
 <p align="center">
-  <h1>Swap-jsbridge</h1>
+  <h1>@swap/jsbridge</h1>
 </p>
 
 ## 如何使用
 安装依赖包
 ```bash
-tnpm install @tencent/swap-jsbridge
+tnpm install @swap/jsbridge
 ```
 接下来
 ```js
 // 1. Import mocking utils.
-import { call, callWithPromise } from '@tencent/swap-jsbridge';
+import { call, callWithPromise } from '@swap/jsbridge';
 // 2. call
 call('jsbridge://weseeLive/getLiveInfo', {})
 ```

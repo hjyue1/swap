@@ -23,7 +23,6 @@ export function printStartMessage(args: PrintStartMessageArgs = {}) {
   )
   // todo
   console.log(
-    '%cDocumentation: %chttps://mswjs.io/docs',
     'font-weight:bold',
     'font-weight:normal',
   )

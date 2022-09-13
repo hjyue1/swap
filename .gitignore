@@ -1,7 +1,6 @@
 __*
 .DS_*
 node_modules
-/lib
 tmp
 *-error.log
 ./package-lock.json
@@ -10,4 +9,3 @@ stats.html
 msw-*.tgz
 .husky/_
 .env
-lib

@@ -16,7 +16,9 @@
     "test": "__tests__"
   },
   "files": [
-    "lib"
+    "lib",
+    "cli",
+    "webpackPlugin"
   ],
   "scripts": {
     "start": "babel-node ./example/test.js",

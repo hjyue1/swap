@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /**
- * Mock Service Worker (1.0.5).
+ * Mock Service Worker (1.0.6).
  * - Please do NOT modify this file.
  * - Please do NOT serve this file on production.
  */

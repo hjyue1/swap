@@ -29,15 +29,15 @@ export default class SwapWebpackPlugin {
   apply(compiler: Compiler) {
     if (version.startsWith('4.')) {
       compiler.hooks.emit.tap(
-        this.constructor.name,
+        this.swName,
         compilation => this.addAssets(compilation as Compilation),
       );
     } else {
       const { PROCESS_ASSETS_STAGE_OPTIMIZE_TRANSFER } = webpack.Compilation;
       // https://github.com/webpack/webpack/issues/11425#issuecomment-690547848
-      compiler.hooks.thisCompilation.tap(this.constructor.name, (compilation) => {
+      compiler.hooks.thisCompilation.tap(this.swName, (compilation) => {
         compilation.hooks.processAssets.tap({
-          name: this.constructor.name,
+          name: this.swName,
           // See https://github.com/webpack/webpack/issues/11822#issuecomment-726184972
           stage: PROCESS_ASSETS_STAGE_OPTIMIZE_TRANSFER - 10,
         }, () => this.addAssets(compilation as Compilation));

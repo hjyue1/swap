@@ -43,7 +43,7 @@
 
 ##### 1.安装依赖包
 ```bash
-tnpm install rocket-swap
+npm install rocket-swap
 ```
 
 ##### 2.根据项目构建方案
@@ -105,26 +105,6 @@ module.exports = {
 }
 ```
 
-## Demo Example
-  - [create-react-app](https://git.code.oa.com/swap/example/simple-react-example)
-  - [vue](https://git.code.oa.com/swap/example/simple-vue-example)
-
-## Document 
->[点击wiki查看](https://git.code.oa.com/rocketliu/swap/wikis/Document)
-
-
-## JSBridge Document
->[点击查看](https://git.code.oa.com/rocketliu/swap-jsbridge)
-
-## 如何在Jest环境下执行
->[点击wiki查看](https://git.code.oa.com/rocketliu/swap/wikis/Jest)
-
-#### Jest Example
-  - [create-react-app](https://git.code.oa.com/rocketliu/swap/wikis/Jest/create-react-app)
-  - [vue](https://git.code.oa.com/rocketliu/swap/wikis/Jest/vue)
-
-## FAQ
->[点击查看](https://git.code.oa.com/rocketliu/swap/wikis/FAQ)
 
 ## 展望
 - 云端API接入
@@ -140,6 +120,5 @@ module.exports = {
 <table>
   <tr>
     <td align="center"><a href="https://git.code.oa.com/u/rocketliu"><img src="https://dayu.oa.com/avatars/rocketliu/profile.jpg" width="100px;" alt=""/><br /><sub><b>Rocketliu</b></sub></a></td>
-    <td align="center"><a href="https://git.code.oa.com/u/frankjwang"><img src="https://dayu.oa.com/avatars/frankjwang/profile.jpg" width="100px;" alt=""/><br /><sub><b>Frankjwang</b></sub></a></td>
   </tr>
 </table>

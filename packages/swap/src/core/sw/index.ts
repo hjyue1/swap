@@ -2,7 +2,7 @@ import { setupWorker } from 'rocket-swap-sw';
 import { transform } from '../../helpers/json-transform';
 import { getStore } from '../../core/store';
 
-const workerStart = function (): void {
+export const workerStart = function (): void {
   if (getStore('mode') === 'JEST') return;
 
   const handlers = transform(getStore('mockData'));
@@ -17,21 +17,14 @@ const workerStart = function (): void {
   });
 };
 
-const workerStop = function (): void {
+export const workerStop = function (): void {
   setupWorker().stop();
 };
 
-const workerRestoreHandlers = function (): void {
+export const workerRestoreHandlers = function (): void {
   setupWorker().restoreHandlers();
 };
 
-const workerResetHandlers = function (): void {
+export const workerResetHandlers = function (): void {
   setupWorker().resetHandlers();
-};
-
-export {
-  workerStart,
-  workerStop,
-  workerRestoreHandlers,
-  workerResetHandlers,
 };

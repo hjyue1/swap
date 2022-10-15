@@ -1,6 +1,7 @@
 import { getStore, patchSetStore } from './core/store';
 import { Store } from './helpers/type';
 import { workerStart, workerStop } from './core/sw';
+import { windvaneStart } from './core/windvane';
 
 /**
  * swap 入口 api
@@ -13,9 +14,10 @@ export const swapInit = (opts: Store): void => {
     ...opts,
   });
 
-  if (getStore('isMock')) return workerStart();
-
-  workerStop();
+  if (!getStore('isMock')) return workerStop()
+  
+  windvaneStart();
+  workerStart();
 };
 
 export const swapStop = workerStop;

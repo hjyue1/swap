@@ -9,3 +9,5 @@ stats.html
 msw-*.tgz
 .husky/_
 .env
+**/**/lib/**
+**/webpackPlugin/**

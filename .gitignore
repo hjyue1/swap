@@ -12,3 +12,4 @@ msw-*.tgz
 **/**/lib/**
 **/webpackPlugin/**
 jest-html-reporters-attach
+coverage

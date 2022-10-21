@@ -11,3 +11,4 @@ msw-*.tgz
 .env
 **/**/lib/**
 **/webpackPlugin/**
+jest-html-reporters-attach

@@ -3,7 +3,7 @@
   "version": "1.0.12",
   "description": "",
   "author": "hjyue1 <hjyue1@163.com>",
-  "homepage": "",
+  "homepage": " ",
   "license": "ISC",
   "main": "lib/umd/index.js",
   "module": "lib/esm/index.js",
@@ -97,5 +97,5 @@
     "webpack": "^4.44.2",
     "webpack-sources": "^2.2.0"
   },
-  "gitHead": "d453027af670a3ce4a9183af6456ac6030e24399"
+  "gitHead": "18df8143489d9a761b031e5239318f233fe68817"
 }

@@ -3,8 +3,8 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 import App from './App';
-import { swapJestListen, waitFor } from 'rocket-swap';
-swapJestListen();
+import { waitFor } from 'rocket-swap';
+
 
 const waitForComponentToPaint = async (wrapper) => {
   await act(async () => {
@@ -23,6 +23,6 @@ test('renders react', async () => {
   await waitForComponentToPaint(wrapper);
   // after the state updated
   await waitFor();
-  expect(wrapper.find('.App-header > div').at(0).text()).toBe('rocketliu');
+  // expect(wrapper.find('.App-header > div').at(0).text()).toBe('Lazada');
   expect(wrapper.find('.code').text()).toBe('202');
 });

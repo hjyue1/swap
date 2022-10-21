@@ -2,8 +2,6 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import App from './App';
-import { swapJestListen } from 'rocket-swap';
-swapJestListen()
 
 test('renders learn react link', async () => {
   render(<App />);
@@ -14,7 +12,7 @@ test('renders learn react link', async () => {
 
   await waitFor(async () => {
     const nextCodeElement = screen.getByText(/202/i);
-    const nextUserElement = screen.getByText(/rocketliu/i);
+    const nextUserElement = screen.getByText(/Lazada/i);
     expect(nextCodeElement).toBeInTheDocument();
     expect(nextUserElement).toBeInTheDocument();
   });

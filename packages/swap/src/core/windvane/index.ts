@@ -58,6 +58,3 @@ export const windvaneStart = function():void {
   
   // window?.addEventListener('load', handleWindvane)
 }
-
-
-windvaneStart()

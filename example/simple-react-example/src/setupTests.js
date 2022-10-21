@@ -6,7 +6,7 @@ import '@testing-library/jest-dom';
 
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
-import { swapJestInit } from 'swap';
+import { swapJestInit } from 'rocket-swap';
 import * as mockData from '../mocker/index.js';
 
 import { configure } from 'enzyme';

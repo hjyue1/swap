@@ -13,3 +13,4 @@ msw-*.tgz
 **/webpackPlugin/**
 jest-html-reporters-attach
 coverage
+coverage/*

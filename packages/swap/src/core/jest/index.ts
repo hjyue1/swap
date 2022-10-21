@@ -1,6 +1,7 @@
 import { setStore, getStore, patchSetStore } from '../../core/store';
 import { transform } from '../../helpers/json-transform';
 import { setupServer } from 'rocket-swap-sw/node';
+import { windvaneStart } from '../windvane/index'
 
 /**
 * @description 环境变量
@@ -38,4 +39,6 @@ export const swapJestListen = function () {
   beforeAll(() => swapServer.listen());
   afterEach(() => swapServer.resetHandlers());
   afterAll(() => swapServer.close());
+
+  windvaneStart()
 };

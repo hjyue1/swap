@@ -52,6 +52,14 @@ const plugins = [
   babel({
     babelHelpers: 'runtime',
     exclude: 'node_modules/**', // 只编译我们的源代码
+    plugins: [
+      [
+        '@babel/plugin-transform-runtime',
+        {
+          regenerator: true
+        }
+      ]
+    ]
   }),
   commonjs(),
   globals(),

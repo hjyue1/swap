@@ -1,14 +1,14 @@
-import { DocumentNode, OperationTypeNode } from 'graphql'
+import type { DocumentNode, OperationTypeNode } from 'graphql'
 import { SerializedResponse } from '../setupWorker/glossary'
 import { data } from '../context/data'
 import { extensions } from '../context/extensions'
 import { errors } from '../context/errors'
+import { field } from '../context/field'
 import { GraphQLPayloadContext } from '../typeUtils'
 import { cookie } from '../context/cookie'
 import {
   defaultContext,
   DefaultContext,
-  MockedRequest,
   RequestHandler,
   RequestHandlerDefaultInfo,
   ResponseResolver,
@@ -27,6 +27,7 @@ import {
 import { getPublicUrlFromRequest } from '../utils/request/getPublicUrlFromRequest'
 import { tryCatch } from '../utils/internal/tryCatch'
 import { devUtils } from '../utils/internal/devUtils'
+import { MockedRequest } from '../utils/request/MockedRequest'
 
 export type ExpectedOperationTypeNode = OperationTypeNode | 'all'
 export type GraphQLHandlerNameSelector = DocumentNode | RegExp | string
@@ -40,6 +41,7 @@ export type GraphQLContext<QueryType extends Record<string, unknown>> =
     extensions: GraphQLPayloadContext<QueryType>
     errors: typeof errors
     cookie: typeof cookie
+    field: typeof field
   }
 
 export const graphqlContext: GraphQLContext<any> = {
@@ -48,6 +50,7 @@ export const graphqlContext: GraphQLContext<any> = {
   extensions,
   errors,
   cookie,
+  field,
 }
 
 export type GraphQLVariables = Record<string, any>
@@ -68,11 +71,6 @@ export interface GraphQLJsonRequestBody<Variables extends GraphQLVariables> {
   variables?: Variables
 }
 
-export interface GraphQLRequest<Variables extends GraphQLVariables>
-  extends MockedRequest<GraphQLRequestBody<Variables>> {
-  variables: Variables
-}
-
 export function isDocumentNode(
   value: DocumentNode | any,
 ): value is DocumentNode {
@@ -81,6 +79,17 @@ export function isDocumentNode(
   }
 
   return typeof value === 'object' && 'kind' in value && 'definitions' in value
+}
+
+export class GraphQLRequest<
+  Variables extends GraphQLVariables,
+> extends MockedRequest<GraphQLRequestBody<Variables>> {
+  constructor(request: MockedRequest, public readonly variables: Variables) {
+    super(request.url, {
+      ...request,
+      body: request['_body'],
+    })
+  }
 }
 
 export class GraphQLHandler<
@@ -148,10 +157,7 @@ export class GraphQLHandler<
     request: Request,
     parsedResult: ParsedGraphQLRequest,
   ): GraphQLRequest<any> {
-    return {
-      ...request,
-      variables: parsedResult?.variables || {},
-    }
+    return new GraphQLRequest(request, parsedResult?.variables || {})
   }
 
   predicate(request: MockedRequest, parsedResult: ParsedGraphQLRequest) {
@@ -188,8 +194,7 @@ Consider naming this operation or using "graphql.operation" request handler to i
 
   log(
     request: Request,
-    response: SerializedResponse,
-    handler: this,
+    response: SerializedResponse<any>,
     parsedRequest: ParsedGraphQLRequest,
   ) {
     const loggedRequest = prepareRequest(request)

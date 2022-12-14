@@ -13,6 +13,7 @@ import { delay } from '../context/delay'
 import { fetch } from '../context/fetch'
 import { ResponseResolutionContext } from '../utils/getResponse'
 import { SerializedResponse } from '../setupWorker/glossary'
+import { MockedRequest } from '../utils/request/MockedRequest'
 
 export type DefaultContext = {
   status: typeof status
@@ -41,26 +42,6 @@ export type DefaultBodyType =
   | boolean
   | null
   | undefined
-
-export interface MockedRequest<Body = DefaultBodyType> {
-  id: string
-  url: URL
-  method: Request['method']
-  headers: Headers
-  cookies: Record<string, string>
-  mode: Request['mode']
-  keepalive: Request['keepalive']
-  cache: Request['cache']
-  destination: Request['destination']
-  integrity: Request['integrity']
-  credentials: Request['credentials']
-  redirect: Request['redirect']
-  referrer: Request['referrer']
-  referrerPolicy: Request['referrerPolicy']
-  body: Body
-  bodyUsed: Request['bodyUsed']
-  passthrough: typeof passthrough
-}
 
 export interface RequestHandlerDefaultInfo {
   header: string
@@ -92,7 +73,7 @@ export type AsyncResponseResolverReturnType<ReturnType> =
 export type ResponseResolver<
   RequestType = MockedRequest,
   ContextType = typeof defaultContext,
-  BodyType = any,
+  BodyType extends DefaultBodyType = any,
 > = (
   req: RequestType,
   res: ResponseComposition<BodyType>,
@@ -159,7 +140,6 @@ export abstract class RequestHandler<
   abstract log(
     request: Request,
     response: SerializedResponse<any>,
-    handler: this,
     parsedResult: ParsedResult,
   ): void
 

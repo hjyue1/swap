@@ -1,6 +1,6 @@
 {
   "name": "rocket-swap",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "",
   "author": "hjyue1 <hjyue1@163.com>",
   "homepage": " ",
@@ -31,7 +31,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "rocket-swap-jsbridge": "^1.0.8",
-    "rocket-swap-sw": "^1.0.13",
+    "rocket-swap-sw": "^1.0.14",
     "tslib": "^2.4.0"
   },
   "devDependencies": {

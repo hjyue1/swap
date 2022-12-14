@@ -99,5 +99,11 @@
     "webpack": "5.68.0",
     "webpack-dev-server": "3.11.2"
   },
+  "resolutions": {
+    "headers-polyfill": "3.0.10"
+  },
+  "overrides": {
+    "headers-polyfill": "3.0.10"
+  },
   "gitHead": "cee2d3bf320e6b2f9a8627140b51d90a131240af"
 }

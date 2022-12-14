@@ -1,12 +1,13 @@
 import { until } from '@open-draft/until'
 import { StrictEventEmitter } from 'strict-event-emitter'
-import { MockedRequest, RequestHandler } from '../handlers/RequestHandler'
+import { RequestHandler } from '../handlers/RequestHandler'
 import { ServerLifecycleEventsMap } from '../node/glossary'
 import { MockedResponse } from '../response'
 import { SharedOptions } from '../sharedOptions'
 import { RequiredDeep } from '../typeUtils'
 import { ResponseLookupResult, getResponse } from './getResponse'
 import { devUtils } from './internal/devUtils'
+import { MockedRequest } from './request/MockedRequest'
 import { onUnhandledRequest } from './request/onUnhandledRequest'
 import { readResponseCookies } from './request/readResponseCookies'
 import { isBypass } from '../utils/matching/bypassUrl'
@@ -34,15 +35,6 @@ export interface HandleRequestOptions<ResponseType> {
    * Invoked when the mocked response is ready to be sent.
    */
   onMockedResponse?(
-    response: ResponseType,
-    handler: RequiredDeep<ResponseLookupResult>,
-  ): void
-
-  /**
-   * Invoked when the mocked response is sent.
-   * Respects the response delay duration.
-   */
-  onMockedResponseSent?(
     response: ResponseType,
     handler: RequiredDeep<ResponseLookupResult>,
   ): void
@@ -142,26 +134,19 @@ Expected response resolver to return a mocked response Object, but got %s. The o
 
   emitter.emit('request:match', request)
 
-  return new Promise((resolve) => {
-    const requiredLookupResult =
-      lookupResult as RequiredDeep<ResponseLookupResult>
-    const transformedResponse =
-      handleRequestOptions?.transformResponse?.(response) ||
-      (response as any as ResponseType)
+  const requiredLookupResult =
+    lookupResult as RequiredDeep<ResponseLookupResult>
 
-    handleRequestOptions?.onMockedResponse?.(
-      transformedResponse,
-      requiredLookupResult,
-    )
+  const transformedResponse =
+    handleRequestOptions?.transformResponse?.(response) ||
+    (response as any as ResponseType)
 
-    setTimeout(() => {
-      handleRequestOptions?.onMockedResponseSent?.(
-        transformedResponse,
-        requiredLookupResult,
-      )
-      emitter.emit('request:end', request)
+  handleRequestOptions?.onMockedResponse?.(
+    transformedResponse,
+    requiredLookupResult,
+  )
 
-      resolve(transformedResponse as ResponseType)
-    }, response.delay ?? 0)
-  })
+  emitter.emit('request:end', request)
+
+  return transformedResponse
 }

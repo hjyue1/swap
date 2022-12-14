@@ -1,12 +1,5 @@
 'use strict'
 
 module.exports = {
-  presets: [
-    [
-      '@babel/preset-env',
-      {
-        targets: '> 0.25%, iOS 9',
-      },
-    ],
-  ],
+  presets: [['@babel/preset-env', { modules: false }]],
 }

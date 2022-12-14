@@ -1,7 +1,7 @@
 import { ResponseTransformer } from '../response'
 
 export const body = <
-  BodyType extends string | Blob | BufferSource | ReadableStream | FormData
+  BodyType extends string | Blob | BufferSource | ReadableStream | FormData,
 >(
   value: BodyType,
 ): ResponseTransformer<BodyType> => {

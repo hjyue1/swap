@@ -1,12 +1,12 @@
-import {
+import type {
   DocumentNode,
   OperationDefinitionNode,
   OperationTypeNode,
-  parse,
 } from 'graphql'
+import { parse } from 'graphql'
 import { GraphQLVariables } from '../../handlers/GraphQLHandler'
-import { MockedRequest } from '../../handlers/RequestHandler'
 import { getPublicUrlFromRequest } from '../request/getPublicUrlFromRequest'
+import { MockedRequest } from '../request/MockedRequest'
 import { devUtils } from './devUtils'
 import { jsonParse } from './jsonParse'
 

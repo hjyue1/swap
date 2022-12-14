@@ -23,6 +23,9 @@ export type ServerLifecycleEventsMap = LifeCycleEventsMap<IsomorphicResponse>
 
 const DEFAULT_LISTEN_OPTIONS: RequiredDeep<SharedOptions> = {
   onUnhandledRequest: 'warn',
+  bypassMode: 'none',
+  isOnline: false,
+  baseURL: ''
 }
 
 export class SetupServerApi extends SetupApi<ServerLifecycleEventsMap> {

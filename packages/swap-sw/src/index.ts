@@ -2,6 +2,9 @@ import * as context from './context'
 export { context }
 
 export { setupWorker } from './setupWorker/setupWorker'
+
+export { SetupApi } from './SetupApi'
+
 export {
   response,
   defaultResponse,
@@ -19,7 +22,6 @@ export { GraphQLHandler, graphqlContext } from './handlers/GraphQLHandler'
 export { matchRequestUrl } from './utils/matching/matchRequestUrl'
 export { compose } from './utils/internal/compose'
 export * from './utils/handleRequest'
-export * from './utils/request/parseIsomorphicRequest'
 export { cleanUrl } from './utils/url/cleanUrl'
 
 /**
@@ -28,8 +30,8 @@ export { cleanUrl } from './utils/url/cleanUrl'
 export type { SetupWorkerApi, StartOptions } from './setupWorker/glossary'
 export type { SharedOptions } from './sharedOptions'
 
+export * from './utils/request/MockedRequest'
 export type {
-  MockedRequest,
   ResponseResolver,
   ResponseResolverReturnType,
   AsyncResponseResolverReturnType,
@@ -46,9 +48,9 @@ export type {
 } from './response'
 
 export type {
+  RestRequest,
   RestContext,
   RequestQuery,
-  RestRequest,
   ParsedRestRequest,
 } from './handlers/RestHandler'
 

@@ -1,5 +1,5 @@
 import { StrictEventEmitter } from 'strict-event-emitter'
-import { MockedRequest } from './handlers/RequestHandler'
+import { MockedRequest } from './utils/request/MockedRequest'
 import { UnhandledRequestStrategy } from './utils/request/onUnhandledRequest'
 
 export interface SharedOptions {
@@ -11,7 +11,7 @@ export interface SharedOptions {
    * @example worker.start({ onUnhandledRequest: 'warn' })
    * @example server.listen({ onUnhandledRequest: 'error' })
    */
-  onUnhandledRequest?: UnhandledRequestStrategy;
+  onUnhandledRequest?: UnhandledRequestStrategy
   /**
    * A custom bypass mode to bypass a request in the list
    * of all request on the page.
@@ -37,7 +37,9 @@ export interface LifeCycleEventsMap<ResponseType> {
   unhandledException: (error: Error, request: MockedRequest) => void
 }
 
-export type LifeCycleEventEmitter<ResponseType> = Pick<
+export type LifeCycleEventEmitter<
+  ResponseType extends Record<string | symbol, any>,
+> = Pick<
   StrictEventEmitter<ResponseType>,
   'on' | 'removeListener' | 'removeAllListeners'
 >

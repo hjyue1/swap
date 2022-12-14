@@ -1,7 +1,6 @@
 import { defineConfig } from 'tsup'
 import { workerScriptPlugin } from './config/plugins/esbuild/workerScriptPlugin'
 
-// TODO
 // Prevent from bunlding the "@mswjs/*" packages
 // so that the users get the latest versions without
 // having to bump them in "msw'."
@@ -12,7 +11,7 @@ export default defineConfig([
     name: 'main',
     entry: ['./src/index.ts'],
     outDir: './lib',
-    format: ['esm', 'cjs'],
+    format: ['cjs'],
     legacyOutput: true,
     sourcemap: true,
     clean: true,
@@ -40,6 +39,7 @@ export default defineConfig([
     entry: ['./src/node/index.ts'],
     format: ['esm', 'cjs'],
     outDir: './lib/node',
+    platform: 'node',
     external: [
       'http',
       'https',

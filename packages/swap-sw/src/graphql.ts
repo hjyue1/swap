@@ -1,4 +1,4 @@
-import { DocumentNode, OperationTypeNode } from 'graphql'
+import type { DocumentNode, OperationTypeNode } from 'graphql'
 import { ResponseResolver } from './handlers/RequestHandler'
 import {
   GraphQLHandler,
@@ -81,7 +81,7 @@ const standardGraphQLHandlers = {
    *   return res(ctx.data({ user: { name: 'John' } }))
    * })
    */
-  query: createScopedGraphQLHandler(OperationTypeNode.QUERY, '*'),
+  query: createScopedGraphQLHandler('query' as OperationTypeNode, '*'),
 
   /**
    * Captures a GraphQL mutation by a given name.
@@ -90,14 +90,14 @@ const standardGraphQLHandlers = {
    *   return res(ctx.data({ post: { id: 'abc-123' } }))
    * })
    */
-  mutation: createScopedGraphQLHandler(OperationTypeNode.MUTATION, '*'),
+  mutation: createScopedGraphQLHandler('mutation' as OperationTypeNode, '*'),
 }
 
 function createGraphQLLink(url: Path): typeof standardGraphQLHandlers {
   return {
     operation: createGraphQLOperationHandler(url),
-    query: createScopedGraphQLHandler(OperationTypeNode.QUERY, url),
-    mutation: createScopedGraphQLHandler(OperationTypeNode.MUTATION, url),
+    query: createScopedGraphQLHandler('query' as OperationTypeNode, url),
+    mutation: createScopedGraphQLHandler('mutation' as OperationTypeNode, url),
   }
 }
 

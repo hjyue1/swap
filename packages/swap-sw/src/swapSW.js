@@ -268,10 +268,6 @@ async function getResponse(event, client, requestId) {
     return fetch(clonedRequest, { headers })
   }
 
-  if (isBypass(requestURL)) {
-    return passthrough()
-  }
-
   // Bypass mocking when the client is not active.
   if (!client) {
     return passthrough()

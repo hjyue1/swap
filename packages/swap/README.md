@@ -77,8 +77,8 @@ import './index.css';
 import App from './App';
 // 引入swap
 if (process.env.NODE_ENV === 'development') {
-  const swap = require('swap')
-  const mockData = require('../mocker')
+  const swap = require('rocket-swap')
+  const mockData = require('../mock')
   swap.swapInit({
     mockData
   })

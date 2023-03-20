@@ -40,6 +40,8 @@
 ##### 注意事项
 > - 需要在`https` 或 `localhost` 的域名中操作，自定义https域名可以利用`whistle`
 > - webpack需要4.40.0以上版本
+> - 如果使用webpack 5 需要额外引用 `node-polyfill-webpack-plugin`
+
 
 ##### 1.安装依赖包
 ```bash
@@ -50,11 +52,13 @@ npm install rocket-swap
   - 如果项目有使用webpack `4.40.0以上版本`
     ```js
     // webpack.config.js
+    // const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');  // webpack 5 需要引入
     const SwapWebpackPlugin = require('rocket-swap/webpackPlugin');
     ...
     module.exports = {
       ...
       plugins: [
+        // new NodePolyfillPlugin(); //webpack 5 需要引入
         new SwapWebpackPlugin();
       ]
     }

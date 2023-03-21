@@ -38,6 +38,7 @@ const handleWindvane = function():void {
   // }
   window.WindVane = new Proxy(window.WindVane, {
     get: function(target, key, receiver) {
+      if(key === 'isAvailable') return true
       if(key === proxyKey) return proxyCallWindvane
       return Reflect.get(target, key, receiver)
     },

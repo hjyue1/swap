@@ -12,7 +12,7 @@ var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
 var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
 
 var name = "rocket-swap";
-var version = "2.0.7";
+var version = "2.0.8";
 var description = "";
 var author = "hjyue1 <hjyue1@163.com>";
 var homepage = " ";

@@ -12232,10 +12232,12 @@ rocket-swap-sw@^2.0.3, "rocket-swap-sw@file:/Users/liudong/Desktop/github/swap/p
     yargs "^17.3.1"
 
 "rocket-swap@file:/Users/liudong/Desktop/github/swap/packages/swap":
-  version "2.0.5"
+  version "2.0.6"
   resolved "file:packages/swap"
   dependencies:
     axios "^0.27.2"
+    rocket-swap-jsbridge "^1.0.9"
+    rocket-swap-sw "^2.0.3"
     tslib "^2.4.0"
 
 rollup-plugin-inject@^3.0.0:

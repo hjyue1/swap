@@ -1,5 +1,5 @@
 import { getStore } from '../store';
-import { handlerRequest } from '../../helpers/utils';
+import { handlerRequest, isClient } from '../../helpers/utils';
 
 declare global {
   interface Window {
@@ -31,7 +31,7 @@ const proxyCallWindvane = async function(...arg) {
 }
 
 const handleWindvane = function():void {
-
+  if(!isClient) return;
   window.WindVane = {}
   // if(!window.WindVane) {
   //   throw('window.WindVane is undefined') 

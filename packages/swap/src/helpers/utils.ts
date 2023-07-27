@@ -77,3 +77,5 @@ export function forEach(obj: any, fn: Function) {
     });
   }
 }
+
+export const isClient = typeof window !== 'undefined'

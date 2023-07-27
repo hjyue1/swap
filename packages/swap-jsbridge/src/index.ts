@@ -1,4 +1,4 @@
-import { getUrl } from './helpers/utils';
+import { getUrl, isClient } from './helpers/utils';
 import { UnKnowObjParam, CallProtoArrayType, jsbridgeOpt } from './helpers/type';
 
 
@@ -6,7 +6,7 @@ declare let window: any;
 
 export function callByLocation(url: string, param?: UnKnowObjParam, extendOpt?: jsbridgeOpt) {
   url = getUrl(url, param, extendOpt);
-  setTimeout(() => {
+  isClient && setTimeout(() => {
     window.location.href = url;
   }, 0);
   return url;

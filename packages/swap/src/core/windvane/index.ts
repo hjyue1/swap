@@ -26,7 +26,7 @@ const proxyCallWindvane = async function(...arg) {
     const res = await handlerRequest(`jsbrdige://${className}/${methodName}`, params)
     successCallback(res)
   }catch(err) {
-    return failureCallback({})
+    return failureCallback?.({})
   }
 }
 

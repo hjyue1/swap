@@ -97,6 +97,6 @@
     "webpack": "^4.44.2",
     "webpack-sources": "^2.2.0"
   },
-  "gitHead": "cee2d3bf320e6b2f9a8627140b51d90a131240af",
+  "gitHead": "a1c4c6d11dd257dee6dc0912f4411ec423127847",
   "repository": "git@github.com:hjyue1/swap.git"
 }

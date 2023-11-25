@@ -7641,6 +7641,11 @@ headers-polyfill@^3.1.0:
   resolved "https://registry.npmjs.org/headers-polyfill/-/headers-polyfill-3.1.2.tgz"
   integrity sha512-tWCK4biJ6hcLqTviLXVR9DTRfYGQMXEIUj3gwJ2rZ5wO/at3XtkI4g8mCvFdUF9l1KMBNCfmNAdnahm1cgavQA==
 
+headers-polyfill@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.anpm.alibaba-inc.com/headers-polyfill/-/headers-polyfill-3.1.0.tgz"
+  integrity sha512-AVwgTAzeGpF7kwUCMc9HbAoCKFcHGEfmWkaI8g0jprrkh9VPRaofIsfV7Lw8UuR9pi4Rk7IIjJce8l0C+jSJNA==
+
 headers-utils@^3.0.2:
   version "3.0.2"
   resolved "https://registry.npmjs.org/headers-utils/-/headers-utils-3.0.2.tgz"
@@ -12201,14 +12206,14 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rocket-swap-jsbridge@^1.0.9, "rocket-swap-jsbridge@file:/Users/liudong/Desktop/github/swap/packages/swap-jsbridge":
-  version "1.0.9"
+rocket-swap-jsbridge@^1.0.10, "rocket-swap-jsbridge@file:/Users/liudong/Desktop/github/swap/packages/swap-jsbridge":
+  version "1.0.10"
   resolved "file:packages/swap-jsbridge"
   dependencies:
     tslib "^2.4.0"
 
-rocket-swap-sw@^2.0.3, "rocket-swap-sw@file:/Users/liudong/Desktop/github/swap/packages/swap-sw":
-  version "2.0.3"
+rocket-swap-sw@^2.0.5, "rocket-swap-sw@file:/Users/liudong/Desktop/github/swap/packages/swap-sw":
+  version "2.0.5"
   resolved "file:packages/swap-sw"
   dependencies:
     "@mswjs/cookies" "^0.2.2"
@@ -12220,7 +12225,7 @@ rocket-swap-sw@^2.0.3, "rocket-swap-sw@file:/Users/liudong/Desktop/github/swap/p
     chokidar "^3.4.2"
     cookie "^0.4.2"
     graphql "^15.0.0 || ^16.0.0"
-    headers-polyfill "^3.1.0"
+    headers-polyfill "3.1.0"
     inquirer "^8.2.0"
     is-node-process "^1.0.1"
     js-levenshtein "^1.1.6"
@@ -12232,12 +12237,12 @@ rocket-swap-sw@^2.0.3, "rocket-swap-sw@file:/Users/liudong/Desktop/github/swap/p
     yargs "^17.3.1"
 
 "rocket-swap@file:/Users/liudong/Desktop/github/swap/packages/swap":
-  version "2.0.8"
+  version "2.0.10"
   resolved "file:packages/swap"
   dependencies:
     axios "^0.27.2"
-    rocket-swap-jsbridge "^1.0.9"
-    rocket-swap-sw "^2.0.3"
+    rocket-swap-jsbridge "^1.0.10"
+    rocket-swap-sw "^2.0.4"
     tslib "^2.4.0"
 
 rollup-plugin-inject@^3.0.0:

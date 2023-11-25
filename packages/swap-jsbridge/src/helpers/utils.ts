@@ -66,4 +66,4 @@ export const getParam = function (obj?: UnKnowObjParam): string {
   return str.join("&");
 }
 
-export const isClient = typeof window !== 'undefined'
+export const isClient = typeof window !== 'undefined' && window.document && window.document.createElement

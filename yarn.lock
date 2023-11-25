@@ -12212,8 +12212,8 @@ rocket-swap-jsbridge@^1.0.10, "rocket-swap-jsbridge@file:/Users/liudong/Desktop/
   dependencies:
     tslib "^2.4.0"
 
-rocket-swap-sw@^2.0.5, "rocket-swap-sw@file:/Users/liudong/Desktop/github/swap/packages/swap-sw":
-  version "2.0.5"
+rocket-swap-sw@^2.0.6, "rocket-swap-sw@file:/Users/liudong/Desktop/github/swap/packages/swap-sw":
+  version "2.0.6"
   resolved "file:packages/swap-sw"
   dependencies:
     "@mswjs/cookies" "^0.2.2"
@@ -12237,12 +12237,12 @@ rocket-swap-sw@^2.0.5, "rocket-swap-sw@file:/Users/liudong/Desktop/github/swap/p
     yargs "^17.3.1"
 
 "rocket-swap@file:/Users/liudong/Desktop/github/swap/packages/swap":
-  version "2.0.10"
+  version "2.0.11"
   resolved "file:packages/swap"
   dependencies:
     axios "^0.27.2"
     rocket-swap-jsbridge "^1.0.10"
-    rocket-swap-sw "^2.0.4"
+    rocket-swap-sw "^2.0.5"
     tslib "^2.4.0"
 
 rollup-plugin-inject@^3.0.0:

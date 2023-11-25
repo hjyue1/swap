@@ -30,8 +30,8 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "rocket-swap-jsbridge": "^1.0.10",
-    "rocket-swap-sw": "^2.0.6",
+    "rocket-swap-jsbridge": "^1.0.9",
+    "rocket-swap-sw": "^2.0.4",
     "tslib": "^2.4.0"
   },
   "devDependencies": {
@@ -97,6 +97,6 @@
     "webpack": "^4.44.2",
     "webpack-sources": "^2.2.0"
   },
-  "gitHead": "a1c4c6d11dd257dee6dc0912f4411ec423127847",
+  "gitHead": "d90a4f6b2aa634ef277c0a73aba0e55acb5474f5",
   "repository": "git@github.com:hjyue1/swap.git"
 }

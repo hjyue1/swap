@@ -31,7 +31,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "rocket-swap-jsbridge": "^1.0.9",
-    "rocket-swap-sw": "^2.0.7",
+    "rocket-swap-sw": "^2.0.13",
     "tslib": "^2.4.0"
   },
   "devDependencies": {
